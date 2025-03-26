@@ -1,4 +1,4 @@
-class VideoPlayer extends HTMLElement {
+export class VideoPlayer extends HTMLElement {
     static get observedAttributes() {
         return [
             'src',
@@ -116,25 +116,27 @@ class VideoPlayer extends HTMLElement {
           transform: translate(-50%, -50%);
           width: 60px;
           height: 60px;
-          background: rgba(255, 255, 255, 0.8);
+          background: var(--play-button-bg, rgba(255, 255, 255, 0.8));
           border-radius: 50%;
           display: flex;
           justify-content: center;
           align-items: center;
           box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-          transition: background 0.3s;
+          transition: background 0.3s, box-shadow 0.3s;
         }
         .play-button::before {
           content: '';
           display: block;
           width: 0;
           height: 0;
-          border-left: 18px solid #000;
+          margin-left: 2px;
+          border-left: 18px solid var(--play-button-arrow, #000);
           border-top: 10px solid transparent;
           border-bottom: 10px solid transparent;
         }
         .play-button:hover {
-          background: rgba(255, 255, 255, 1);
+          background: var(--play-button-bg-hover, rgba(255, 255, 255, 1));
+          box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
       </style>
       <div class="video-wrapper">
@@ -226,7 +228,11 @@ class VideoPlayer extends HTMLElement {
     }
 }
 
-customElements.define('video-player', VideoPlayer)
+export function registerVideoPlayer(tagName = 'video-player') {
+    if (!customElements.get(tagName)) {
+        customElements.define(tagName, VideoPlayer)
+    }
+}
 
 export default VideoPlayer
 
