@@ -9,6 +9,7 @@ class VideoPlayer extends HTMLElement {
             'playbutton',
             'allowfullscreen',
             'aspect-ratio',
+            'autosize',
         ]
     }
 
@@ -33,6 +34,7 @@ class VideoPlayer extends HTMLElement {
             this.getAttribute('posteralt') || 'Video preview image'
         const showPlayButton = this.hasAttribute('playbutton')
         const allowFullscreen = this.hasAttribute('allowfullscreen')
+        const autosize = this.hasAttribute('autosize')
         const aspectRatio = this.getAttribute('aspect-ratio') || '16x9'
 
         const aspectRatios = {
@@ -88,7 +90,7 @@ class VideoPlayer extends HTMLElement {
       <style>
         :host {
           display: block;
-          max-width: 100%;
+          ${autosize ? 'width: 100%;' : ''}
         }
         .video-wrapper {
           position: relative;
@@ -240,6 +242,7 @@ export default VideoPlayer
  *   }'
  *   posteralt="Watch this cool video"
  *   playbutton
+ *   autosize
  *   allowfullscreen
  *   aspect-ratio="16x9">
  * </video-player>
@@ -251,6 +254,7 @@ export default VideoPlayer
  *     "png": "/cms/poster.png"
  *   }'
  *   playbutton
+ *   autosize
  *   allowfullscreen
  *   aspect-ratio="4x3">
  * </video-player>
@@ -267,6 +271,7 @@ export default VideoPlayer
  *   }'
  *   posteralt="Preview frame for custom video"
  *   playbutton
+ *   autosize
  *   aspect-ratio="9x16">
  * </video-player>
  *
