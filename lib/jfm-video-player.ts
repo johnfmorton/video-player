@@ -112,7 +112,7 @@ class VideoPlayer extends HTMLElement {
         container.classList.remove('hidden')
 
         const posterImg = this.shadowRoot!.querySelector('.poster')
-        if (posterImg) posterImg.classList.add('hidden')
+        posterImg?.classList.add('hidden')
     }
 
     _extractYouTubeID(url) {
