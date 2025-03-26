@@ -52,7 +52,7 @@ export class VideoPlayer extends HTMLElement {
                 const parsed = JSON.parse(posters)
                 const fallback = parsed.jpg || parsed.png || ''
                 posterHTML = `
-          <picture class="poster">
+          <picture class="poster" tabindex="0" role="button" aria-label="Play video">
             ${
                 parsed.avif
                     ? `<source type="image/avif" srcset="${parsed.avif}">`
@@ -79,11 +79,11 @@ export class VideoPlayer extends HTMLElement {
                 console.warn('Invalid JSON in posters attribute:', e)
             }
         } else if (poster) {
-            posterHTML = `<img class="poster" src="${poster}" alt="${posterAlt}">`
+            posterHTML = `<img class="poster" src="${poster}" alt="${posterAlt}" tabindex="0" role="button" aria-label="Play video">`
         }
 
         const playButtonHTML = showPlayButton
-            ? `<div class="play-button" role="button" aria-label="Play video"></div>`
+            ? `<button class="play-button" aria-label="Play video"></button>`
             : ''
 
         this.shadowRoot!.innerHTML = `
@@ -121,6 +121,8 @@ export class VideoPlayer extends HTMLElement {
           display: flex;
           justify-content: center;
           align-items: center;
+          border: none;
+          cursor: pointer;
           box-shadow: 0 2px 6px rgba(0,0,0,0.2);
           transition: background 0.3s, box-shadow 0.3s;
         }
@@ -146,21 +148,31 @@ export class VideoPlayer extends HTMLElement {
       </div>
     `
 
-        if (posterHTML) {
-            const clickTargets = this.shadowRoot!.querySelectorAll(
-                '.poster, .play-button'
+        const clickTargets =
+            this.shadowRoot!.querySelectorAll('[role="button"]')
+        clickTargets.forEach((el) => {
+            el?.addEventListener('click', () =>
+                this._loadVideo({
+                    src,
+                    sources,
+                    allowFullscreen,
+                    autoplay: true,
+                })
             )
-            clickTargets.forEach((el) => {
-                el?.addEventListener('click', () =>
+            el?.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
                     this._loadVideo({
                         src,
                         sources,
                         allowFullscreen,
                         autoplay: true,
                     })
-                )
+                }
             })
-        } else {
+        })
+
+        if (!posterHTML) {
             this._loadVideo({ src, sources, allowFullscreen, autoplay: false })
         }
     }
@@ -177,12 +189,12 @@ export class VideoPlayer extends HTMLElement {
             const videoId = this._extractYouTubeID(src)
             embedHTML = `<iframe src="https://www.youtube.com/embed/${videoId}${
                 autoplay ? '?autoplay=1' : ''
-            }" frameborder="0" ${allowAttrs} ${fullscreenAttr} aria-label="YouTube Video"></iframe>`
+            }" frameborder="0" ${allowAttrs} ${fullscreenAttr} title="YouTube Video"></iframe>`
         } else if (/vimeo\.com/.test(src)) {
             const videoId = this._extractVimeoID(src)
             embedHTML = `<iframe src="https://player.vimeo.com/video/${videoId}${
                 autoplay ? '?autoplay=1' : ''
-            }" frameborder="0" ${allowAttrs} ${fullscreenAttr} aria-label="Vimeo Video"></iframe>`
+            }" frameborder="0" ${allowAttrs} ${fullscreenAttr} title="Vimeo Video"></iframe>`
         } else {
             let sourcesHTML = ''
             if (sources) {
@@ -235,51 +247,3 @@ export function registerVideoPlayer(tagName = 'video-player') {
 }
 
 export default VideoPlayer
-
-/**
- * USAGE:
- *
- * YouTube:
- * <video-player
- *   src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
- *   posters='{
- *     "webp": "/cms/poster.webp",
- *     "png": "/cms/poster.png"
- *   }'
- *   posteralt="Watch this cool video"
- *   playbutton
- *   autosize
- *   allowfullscreen
- *   aspect-ratio="16x9">
- * </video-player>
- *
- * Vimeo:
- * <video-player
- *   src="https://vimeo.com/12345678"
- *   posters='{
- *     "png": "/cms/poster.png"
- *   }'
- *   playbutton
- *   autosize
- *   allowfullscreen
- *   aspect-ratio="4x3">
- * </video-player>
- *
- * Self-hosted:
- * <video-player
- *   sources='[
- *     { "src": "/videos/video.webm", "type": "video/webm" },
- *     { "src": "/videos/video.mp4", "type": "video/mp4" }
- *   ]'
- *   posters='{
- *     "avif": "/images/poster.avif",
- *     "jpg": "/images/poster.jpg"
- *   }'
- *   posteralt="Preview frame for custom video"
- *   playbutton
- *   autosize
- *   aspect-ratio="9x16">
- * </video-player>
- *
- * Include this script in your HTML or import it via a <script type="module"> tag.
- */
