@@ -1,38 +1,26 @@
-export interface VideoPlayerProps {
-  src: string
-  poster?: string
-  allowfullscreen?: boolean
-  aspectRatio?: '16x9' | '4x3' | '1x1' | '9x16'
-}
-
 class VideoPlayer extends HTMLElement {
-    // Observe changes to these attributes so we can re-render accordingly
     static get observedAttributes() {
         return ['src', 'poster', 'allowfullscreen', 'aspect-ratio']
     }
 
     constructor() {
         super()
-        // Attach shadow DOM for encapsulation
         this.attachShadow({ mode: 'open' })
         this._render()
     }
 
-    // Called whenever observed attributes are changed
     attributeChangedCallback(name, oldValue, newValue) {
         if (oldValue !== newValue) {
             this._render()
         }
     }
 
-    // Core rendering logic to determine media type and display the appropriate player
     _render() {
         const src = this.getAttribute('src') || ''
         const poster = this.getAttribute('poster') || ''
         const allowFullscreen = this.hasAttribute('allowfullscreen')
         const aspectRatio = this.getAttribute('aspect-ratio') || '16x9'
 
-        // Common aspect ratios and their percentage-based padding
         const aspectRatios = {
             '16x9': 56.25,
             '4x3': 75,
@@ -40,37 +28,10 @@ class VideoPlayer extends HTMLElement {
             '9x16': 177.78,
         }
 
-        // Determine padding for responsive ratio
         const paddingTop = aspectRatios[aspectRatio] || 56.25
 
-        let embedHTML = ''
-
-        // Handle YouTube embedding
-        if (/youtube\.com|youtu\.be/.test(src)) {
-            const videoId = this._extractYouTubeID(src)
-            embedHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" ${
-                allowFullscreen ? 'allowfullscreen' : ''
-            } aria-label="YouTube Video"></iframe>`
-
-            // Handle Vimeo embedding
-        } else if (/vimeo\.com/.test(src)) {
-            const videoId = this._extractVimeoID(src)
-            embedHTML = `<iframe src="https://player.vimeo.com/video/${videoId}" frameborder="0" ${
-                allowFullscreen ? 'allowfullscreen' : ''
-            } aria-label="Vimeo Video"></iframe>`
-
-            // Handle self-hosted video
-        } else {
-            embedHTML = `
-        <video src="${src}" ${
-                poster ? `poster="${poster}"` : ''
-            } controls aria-label="Self-hosted Video">
-          Your browser does not support the video tag.
-        </video>`
-        }
-
-        // Apply styles and insert the video player markup
-        this.shadowRoot!.innerHTML = `
+        // Build the wrapper and placeholder
+        this.shadowRoot.innerHTML = `
       <style>
         :host {
           display: block;
@@ -81,21 +42,69 @@ class VideoPlayer extends HTMLElement {
           width: 100%;
           padding-top: ${paddingTop}%;
         }
-        iframe, video {
+        iframe, video, img.poster {
           position: absolute;
           top: 0;
           left: 0;
           width: 100%;
           height: 100%;
+          object-fit: cover;
+          cursor: pointer;
+        }
+        .hidden {
+          display: none;
         }
       </style>
       <div class="video-wrapper">
-        ${embedHTML}
+        ${
+            poster
+                ? `<img class="poster" src="${poster}" alt="Video preview image">`
+                : ''
+        }
+        <div class="video-container hidden"></div>
       </div>
     `
+
+        // Add click handler to show and play the video when the poster is clicked
+        if (poster) {
+            const posterImg = this.shadowRoot.querySelector('.poster')
+            posterImg.addEventListener('click', () =>
+                this._loadVideo(src, allowFullscreen)
+            )
+        } else {
+            // If no poster is defined, load the video immediately
+            this._loadVideo(src, allowFullscreen)
+        }
     }
 
-    // Extract the YouTube video ID from various YouTube URL formats
+    // Loads the correct video type into the container and optionally starts playback
+    _loadVideo(src, allowFullscreen) {
+        const container = this.shadowRoot.querySelector('.video-container')
+        if (!container) return
+
+        let embedHTML = ''
+
+        if (/youtube\.com|youtu\.be/.test(src)) {
+            const videoId = this._extractYouTubeID(src)
+            embedHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" frameborder="0" ${
+                allowFullscreen ? 'allowfullscreen' : ''
+            } aria-label="YouTube Video"></iframe>`
+        } else if (/vimeo\.com/.test(src)) {
+            const videoId = this._extractVimeoID(src)
+            embedHTML = `<iframe src="https://player.vimeo.com/video/${videoId}?autoplay=1" frameborder="0" ${
+                allowFullscreen ? 'allowfullscreen' : ''
+            } aria-label="Vimeo Video"></iframe>`
+        } else {
+            embedHTML = `<video src="${src}" autoplay controls aria-label="Self-hosted Video"></video>`
+        }
+
+        container.innerHTML = embedHTML
+        container.classList.remove('hidden')
+
+        const posterImg = this.shadowRoot.querySelector('.poster')
+        if (posterImg) posterImg.classList.add('hidden')
+    }
+
     _extractYouTubeID(url) {
         const regExp =
             /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/
@@ -103,7 +112,6 @@ class VideoPlayer extends HTMLElement {
         return match ? match[1] : ''
     }
 
-    // Extract the Vimeo video ID from a Vimeo URL
     _extractVimeoID(url) {
         const regExp = /vimeo\.com\/(?:video\/)?(\d+)/
         const match = url.match(regExp)
@@ -111,8 +119,9 @@ class VideoPlayer extends HTMLElement {
     }
 }
 
-// Define the custom element
 customElements.define('video-player', VideoPlayer)
+
+export default VideoPlayer;
 
 /**
  * USAGE:
@@ -122,5 +131,3 @@ customElements.define('video-player', VideoPlayer)
  *
  * Place this script in your HTML or import it via a <script type="module"> tag.
  */
-
-export default VideoPlayer;
