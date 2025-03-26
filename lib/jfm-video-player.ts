@@ -31,7 +31,7 @@ class VideoPlayer extends HTMLElement {
         const paddingTop = aspectRatios[aspectRatio] || 56.25
 
         // Build the wrapper and placeholder
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot!.innerHTML = `
       <style>
         :host {
           display: block;
@@ -61,53 +61,64 @@ class VideoPlayer extends HTMLElement {
                 ? `<img class="poster" src="${poster}" alt="Video preview image">`
                 : ''
         }
-        <div class="video-container hidden"></div>
+        <div class="video-container ${poster ? 'hidden' : ''}"></div>
       </div>
     `
 
-        // Add click handler to show and play the video when the poster is clicked
+        // If poster exists, load video on click with autoplay
         if (poster) {
-            const posterImg = this.shadowRoot.querySelector('.poster')
-            posterImg.addEventListener('click', () =>
-                this._loadVideo(src, allowFullscreen)
+            const posterImg = this.shadowRoot!.querySelector('.poster')
+            posterImg?.addEventListener('click', () =>
+                this._loadVideo(src, allowFullscreen, true)
             )
         } else {
-            // If no poster is defined, load the video immediately
-            this._loadVideo(src, allowFullscreen)
+            // Load video immediately without autoplay
+            this._loadVideo(src, allowFullscreen, false)
         }
     }
 
-    // Loads the correct video type into the container and optionally starts playback
-    _loadVideo(src, allowFullscreen) {
-        const container = this.shadowRoot.querySelector('.video-container')
+    /**
+     * Loads the appropriate video player into the DOM.
+     * @param {string} src - Video source URL
+     * @param {boolean} allowFullscreen - Whether fullscreen is allowed
+     * @param {boolean} autoplay - Whether to autoplay the video
+     */
+    _loadVideo(src, allowFullscreen, autoplay) {
+        const container = this.shadowRoot!.querySelector('.video-container')
         if (!container) return
 
         let embedHTML = ''
 
+        const allowAttrs = `allow="${autoplay ? 'autoplay' : ''}"`
+        const fullscreenAttr = allowFullscreen ? 'allowfullscreen' : ''
+
         if (/youtube\.com|youtu\.be/.test(src)) {
             const videoId = this._extractYouTubeID(src)
-            embedHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" frameborder="0" ${
-                allowFullscreen ? 'allowfullscreen' : ''
-            } aria-label="YouTube Video"></iframe>`
+            embedHTML = `<iframe src="https://www.youtube.com/embed/${videoId}${
+                autoplay ? '?autoplay=1' : ''
+            }" frameborder="0" ${allowAttrs} ${fullscreenAttr} aria-label="YouTube Video"></iframe>`
         } else if (/vimeo\.com/.test(src)) {
             const videoId = this._extractVimeoID(src)
-            embedHTML = `<iframe src="https://player.vimeo.com/video/${videoId}?autoplay=1" frameborder="0" ${
-                allowFullscreen ? 'allowfullscreen' : ''
-            } aria-label="Vimeo Video"></iframe>`
+            embedHTML = `<iframe src="https://player.vimeo.com/video/${videoId}${
+                autoplay ? '?autoplay=1' : ''
+            }" frameborder="0" ${allowAttrs} ${fullscreenAttr} aria-label="Vimeo Video"></iframe>`
         } else {
-            embedHTML = `<video src="${src}" autoplay controls aria-label="Self-hosted Video"></video>`
+            embedHTML = `<video src="${src}" ${
+                autoplay ? 'autoplay' : ''
+            } controls aria-label="Self-hosted Video"></video>`
         }
 
         container.innerHTML = embedHTML
         container.classList.remove('hidden')
 
-        const posterImg = this.shadowRoot.querySelector('.poster')
+        const posterImg = this.shadowRoot!.querySelector('.poster')
         if (posterImg) posterImg.classList.add('hidden')
     }
 
     _extractYouTubeID(url) {
+        // Support standard, short, embed, and shorts YouTube URLs
         const regExp =
-            /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/
+            /(?:youtube\.com\/(?:shorts\/|watch\?v=|embed\/)|youtu\.be\/)([^"&?/\s]{11})/
         const match = url.match(regExp)
         return match ? match[1] : ''
     }
@@ -121,11 +132,12 @@ class VideoPlayer extends HTMLElement {
 
 customElements.define('video-player', VideoPlayer)
 
-export default VideoPlayer;
+export default VideoPlayer
 
 /**
  * USAGE:
  * <video-player src="https://www.youtube.com/watch?v=dQw4w9WgXcQ" allowfullscreen aspect-ratio="16x9"></video-player>
+ * <video-player src="https://youtube.com/shorts/ZqxIQa4yjII" allowfullscreen aspect-ratio="9x16"></video-player>
  * <video-player src="https://vimeo.com/12345678" allowfullscreen aspect-ratio="4x3"></video-player>
  * <video-player src="/videos/my-video.mp4" poster="/images/poster.jpg" aspect-ratio="9x16"></video-player>
  *

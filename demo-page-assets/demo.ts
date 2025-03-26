@@ -2,7 +2,7 @@
 // This is the entry point for the demo page. It's a TypeScript file that
 //  loads in the module that we're buidling with this repo
 import ModuleDemoPage from '../lib/jfm-video-player'
-ModuleDemoPage.init('Success! The module is working.')
+ModuleDemoPage.init()
 
 import './style.pcss';
 
