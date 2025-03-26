@@ -37,7 +37,7 @@ Then run the following command:
 npm run project-setup
 ```
 
-This will replace all the instances of "vite-module-builder-w-ghpages-npm-template" with the name of your module. It will also update the `package.json` and `vite.demo.config.js` files with the git repository URL.
+This will replace all the instances of "jfm-video-player" with the name of your module. It will also update the `package.json` and `vite.demo.config.js` files with the git repository URL.
 
 The script will also run `npm install` to install the dependencies for the repo. There is [additional information about the files](#additional-information-about-the-files) at the end of the document.
 
@@ -81,7 +81,7 @@ You can re-enable the workflows by clicking the "Enable Actions" button on this 
 
 The configuration script should have updated all the files in the repo with the name of your module, but it is important to understand what is in the repo and how it works, keep reading.
 
-The most important file in this repo is the `lib/vite-module-builder-w-ghpages-npm-template.ts` file.
+The most important file in this repo is the `lib/jfm-video-player.ts` file.
 
 The name of the file is important. It is the name of the module you are creating. You will need to update the name of the file and the name of the module in the file.
 
@@ -90,16 +90,16 @@ The name of the file is important. It is the name of the module you are creating
 * README.md - The README.md file for your module. You will need to update the name of the module in the file plus create documentation for your module.
 * vite.config.ts - The Vite configuration file for your module build process.
 * vite.demo.config.js - The Vite configuration file for your demo page build process for GitHub Pages.
-* lib/vite-module-builder-w-ghpages-npm-template.ts - The demo page imports this file to test your module. You will need to update the name of the module in the file.
+* lib/jfm-video-player.ts - The demo page imports this file to test your module. You will need to update the name of the module in the file.
 
 For a working example, check out this repo: https://github.com/johnfmorton/progressive-share-button
 
 You will see how I use "progressive-share-button" as the name of the module and the name of the file. I also use it in the `package.json` file.
 
-`lib/vite-module-builder-w-ghpages-npm-template.ts` is where you create the module you are working on. For this demo, it is a simple function that looks for an HTML element with the id of "messageOutput" and then sets the text of that element to the message you pass in. The file serves as a starting point for you to build your module. Ultimately, you will use Vite to create a Command JS module and a ESM module. See the `package.json` file for references to both of these.
+`lib/jfm-video-player.ts` is where you create the module you are working on. For this demo, it is a simple function that looks for an HTML element with the id of "messageOutput" and then sets the text of that element to the message you pass in. The file serves as a starting point for you to build your module. Ultimately, you will use Vite to create a Command JS module and a ESM module. See the `package.json` file for references to both of these.
 
 The other imporatnt page is the `index.html` file. This is the demo page for your module. It includes the `demo-page-assets/demo.ts` file which is where you will write the code to test your module. This page is using Vite for development and the build process.
 
 You can see the demo page for this repo at:
 
-https://johnfmorton.github.io/vite-module-builder-w-ghpages-npm-template/
+https://johnfmorton.github.io/jfm-video-player/

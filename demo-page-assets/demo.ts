@@ -1,7 +1,7 @@
 // Path: demo-page-assets/demo.ts
 // This is the entry point for the demo page. It's a TypeScript file that
 //  loads in the module that we're buidling with this repo
-import ModuleDemoPage from '../lib/vite-module-builder-w-ghpages-npm-template'
+import ModuleDemoPage from '../lib/jfm-video-player'
 ModuleDemoPage.init('Success! The module is working.')
 
 import './style.pcss';

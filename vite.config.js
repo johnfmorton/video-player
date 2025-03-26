@@ -12,11 +12,11 @@ module.exports = defineConfig({
         lib: {
             entry: path.resolve(
                 __dirname,
-                'lib/vite-module-builder-w-ghpages-npm-template.ts'
+                'lib/jfm-video-player.ts'
             ),
-            name: 'vite-module-builder-w-ghpages-npm-template',
+            name: 'jfm-video-player',
             fileName: (format) =>
-                `vite-module-builder-w-ghpages-npm-template.${format}.js`,
+                `jfm-video-player.${format}.js`,
         },
         minify: false,
     },
