@@ -19,7 +19,11 @@ export class VideoPlayer extends HTMLElement {
         this._render()
     }
 
-    attributeChangedCallback(name, oldValue, newValue) {
+    attributeChangedCallback(
+        _name: string,
+        oldValue: string | null,
+        newValue: string | null
+    ) {
         if (oldValue !== newValue) {
             this._render()
         }
@@ -27,7 +31,10 @@ export class VideoPlayer extends HTMLElement {
 
     _render() {
         const src = this.getAttribute('src') || ''
-        const sources = this.getAttribute('sources')
+        const sources = this.hasAttribute('sources')
+            ? this.getAttribute('sources')!
+            : undefined
+
         const poster = this.getAttribute('poster') || ''
         const posters = this.getAttribute('posters')
         const posterAlt =
@@ -44,7 +51,8 @@ export class VideoPlayer extends HTMLElement {
             '9x16': 177.78,
         }
 
-        const paddingTop = aspectRatios[aspectRatio] || 56.25
+        const paddingTop =
+            aspectRatios[aspectRatio as keyof typeof aspectRatios] || 56.25
 
         let posterHTML = ''
         if (posters) {
@@ -160,7 +168,8 @@ export class VideoPlayer extends HTMLElement {
                 })
             )
             el?.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
+                const key = (e as KeyboardEvent).key
+                if (key === 'Enter' || key === ' ') {
                     e.preventDefault()
                     this._loadVideo({
                         src,
@@ -177,7 +186,17 @@ export class VideoPlayer extends HTMLElement {
         }
     }
 
-    _loadVideo({ src, sources, allowFullscreen, autoplay }) {
+    _loadVideo({
+        src,
+        sources,
+        allowFullscreen,
+        autoplay,
+    }: {
+        src: string
+        sources?: string
+        allowFullscreen: boolean
+        autoplay: boolean
+    }) {
         const container = this.shadowRoot!.querySelector('.video-container')
         if (!container) return
 
@@ -199,7 +218,8 @@ export class VideoPlayer extends HTMLElement {
             let sourcesHTML = ''
             if (sources) {
                 try {
-                    const parsed = JSON.parse(sources)
+                    const parsed: { src: string; type: string }[] =
+                        JSON.parse(sources)
                     sourcesHTML = parsed
                         .map((s) => `<source src="${s.src}" type="${s.type}">`)
                         .join('\n')
@@ -226,14 +246,14 @@ export class VideoPlayer extends HTMLElement {
         playBtn?.classList.add('hidden')
     }
 
-    _extractYouTubeID(url) {
+    _extractYouTubeID(url:string) {
         const regExp =
             /(?:youtube\.com\/(?:shorts\/|watch\?v=|embed\/)|youtu\.be\/)([^"&?/\s]{11})/
         const match = url.match(regExp)
         return match ? match[1] : ''
     }
 
-    _extractVimeoID(url) {
+    _extractVimeoID(url:string) {
         const regExp = /vimeo\.com\/(?:video\/)?(\d+)/
         const match = url.match(regExp)
         return match ? match[1] : ''

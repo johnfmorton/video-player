@@ -23,7 +23,7 @@
         "clean": "rm -rf dist demo",
         "dev": "vite --host 0.0.0.0 --port 8888",
         "vite-build": "vite build --config vite.demo.config.js",
-        "build": "vite build --config vite.demo.config.js && vite build && tsc lib/jfm-video-player.ts --declaration --emitDeclarationOnly --outFile dist/jfm-video-player.d.ts",
+        "build": "vite build --config vite.demo.config.js && vite build && tsc -p tsconfig.build.json",
         "preview": "vite preview",
         "project-setup": "node project-setup.js && npm install",
         "test": "echo \"Error: no test specified\" && exit 1"

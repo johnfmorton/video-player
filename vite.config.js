@@ -8,15 +8,13 @@ import pkg from './package.json'
 const now = new Date().toISOString()
 
 module.exports = defineConfig({
+    publicDir: false,
     build: {
         lib: {
-            entry: path.resolve(
-                __dirname,
-                'lib/jfm-video-player.ts'
-            ),
+            entry: path.resolve(__dirname, 'lib/jfm-video-player.ts'),
             name: 'jfm-video-player',
-            fileName: (format) =>
-                `jfm-video-player.${format}.js`,
+            formats: ['es'],
+            fileName: (format) => `jfm-video-player.${format}.js`,
         },
         minify: false,
     },
