@@ -7,7 +7,6 @@ declare var Vimeo: any
 
 export class VideoPlayer extends HTMLElement {
     private _playerType: 'self-hosted' | 'youtube' | 'vimeo' = 'self-hosted'
-    // Removed _currentSrc guard to avoid blocking rendering
 
     static get observedAttributes() {
         return [
@@ -161,7 +160,6 @@ export class VideoPlayer extends HTMLElement {
             this.shadowRoot!.querySelectorAll('[role="button"]')
         clickTargets.forEach((el) => {
             el?.addEventListener('click', () => {
-                // Set the correct player type before loading video
                 this._playerType = this._detectPlayerType(src)
                 this._loadVideo({
                     src,
@@ -172,7 +170,6 @@ export class VideoPlayer extends HTMLElement {
             })
         })
 
-        // If no poster exists, load immediately
         if (!posterHTML) {
             this._playerType = this._detectPlayerType(src)
             this._emitEvent('video-load')
@@ -248,7 +245,6 @@ export class VideoPlayer extends HTMLElement {
         container.innerHTML = embedHTML
         container.classList.remove('hidden')
 
-        // Hide poster and play button
         const posterEl = this.shadowRoot!.querySelector('.poster')
         posterEl?.classList.add('hidden')
         const playBtn = this.shadowRoot!.querySelector('.play-button')
@@ -299,6 +295,10 @@ export class VideoPlayer extends HTMLElement {
             '#selfHostedPlayer'
         ) as HTMLVideoElement
         if (!video) return
+
+        // Prevent attaching duplicate listeners by checking for a custom attribute.
+        if (video.getAttribute('data-listeners-attached') === 'true') return
+        video.setAttribute('data-listeners-attached', 'true')
 
         video.addEventListener('play', () => this._emitEvent('video-play'))
         video.addEventListener('pause', () => this._emitEvent('video-pause'))
