@@ -214,13 +214,12 @@ export class VideoPlayer extends HTMLElement {
       </div>
     `
 
-        // Attach click and keydown listeners to interactive elements
+        // Attach both click and keydown listeners to elements with role="button"
         const clickTargets =
             this.shadowRoot!.querySelectorAll('[role="button"]')
         clickTargets.forEach((el) => {
             const handler = () => {
                 this._playerType = this._detectPlayerType(src)
-                // For YouTube and self-hosted, if a poster exists, emit video-play immediately
                 if (
                     this.shadowRoot!.querySelector('.poster') &&
                     this._playerType !== 'vimeo'
@@ -234,13 +233,12 @@ export class VideoPlayer extends HTMLElement {
                     autoplay: true,
                 })
             }
-            el?.addEventListener('click', handler)
+            el?.addEventListener('click', handler, { passive: true })
             el?.addEventListener('keydown', (e) => {
                 const key = (e as KeyboardEvent).key
                 if (key === 'Enter' || key === ' ') {
                     e.preventDefault()
                     handler()
-                    // For self-hosted videos, set focus on the video element after loading
                     if (this._playerType === 'self-hosted') {
                         setTimeout(() => {
                             const video = this.shadowRoot!.querySelector(
