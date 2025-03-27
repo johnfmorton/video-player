@@ -160,7 +160,15 @@ export class VideoPlayer extends HTMLElement {
             this.shadowRoot!.querySelectorAll('[role="button"]')
         clickTargets.forEach((el) => {
             el?.addEventListener('click', () => {
+                // Set the correct player type first
                 this._playerType = this._detectPlayerType(src)
+                // If a poster exists and the player is not Vimeo, emit video-play immediately
+                if (
+                    this.shadowRoot!.querySelector('.poster') &&
+                    this._playerType !== 'vimeo'
+                ) {
+                    this._emitEvent('video-play')
+                }
                 this._loadVideo({
                     src,
                     sources,
@@ -296,7 +304,6 @@ export class VideoPlayer extends HTMLElement {
         ) as HTMLVideoElement
         if (!video) return
 
-        // Prevent attaching duplicate listeners by checking for a custom attribute.
         if (video.getAttribute('data-listeners-attached') === 'true') return
         video.setAttribute('data-listeners-attached', 'true')
 
