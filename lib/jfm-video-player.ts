@@ -26,7 +26,7 @@ export class VideoPlayer extends HTMLElement {
 
     constructor() {
         super()
-        // Removed: this.setAttribute('tabindex', '0');
+        // Removed tabindex on host to avoid extra tab stops.
         this.attachShadow({ mode: 'open' })
         this._playerType = 'self-hosted'
         this._render()
@@ -63,6 +63,19 @@ export class VideoPlayer extends HTMLElement {
         return 'self-hosted'
     }
 
+    // Converts an aspect ratio string like "16x9" into CSS format "16 / 9"
+    private _getCssAspectRatio(aspect: string): string {
+        const parts = aspect.split('x')
+        if (
+            parts.length === 2 &&
+            !isNaN(Number(parts[0])) &&
+            !isNaN(Number(parts[1]))
+        ) {
+            return `${parts[0]} / ${parts[1]}`
+        }
+        return '16 / 9'
+    }
+
     private _render() {
         const src = this.getAttribute('src') || ''
         const sources = this.hasAttribute('sources')
@@ -87,6 +100,9 @@ export class VideoPlayer extends HTMLElement {
 
         const paddingTop =
             aspectRatios[aspectRatio as keyof typeof aspectRatios] || 56.25
+
+        // Get CSS aspect ratio for poster element
+        const cssAspectRatio = this._getCssAspectRatio(aspectRatio)
 
         let posterHTML = ''
         if (posters) {
@@ -115,13 +131,13 @@ export class VideoPlayer extends HTMLElement {
                     ? `<source type="image/png" srcset="${parsed.png}">`
                     : ''
             }
-            <img class="poster" src="${fallback}" alt="${posterAlt}">
+            <img class="poster" src="${fallback}" alt="${posterAlt}" style="aspect-ratio: ${cssAspectRatio};">
           </picture>`
             } catch (e) {
                 console.warn('Invalid JSON in posters attribute:', e)
             }
         } else if (poster) {
-            posterHTML = `<img class="poster" src="${poster}" alt="${posterAlt}" tabindex="0" role="button" aria-label="Play video">`
+            posterHTML = `<img class="poster" src="${poster}" alt="${posterAlt}" tabindex="0" role="button" aria-label="Play video" style="aspect-ratio: ${cssAspectRatio};">`
         }
 
         const playButtonHTML = showPlayButton
@@ -133,6 +149,9 @@ export class VideoPlayer extends HTMLElement {
         :host {
           display: block;
           ${autosize ? 'width: 100%;' : ''}
+          --play-button-bg: rgba(255, 255, 255, 0.8);
+          --play-button-bg-hover: rgba(255, 255, 255, 1);
+          --play-button-arrow: #000;
         }
         .video-wrapper {
           position: relative;
@@ -148,8 +167,43 @@ export class VideoPlayer extends HTMLElement {
           object-fit: cover;
           cursor: pointer;
         }
+        .poster, .poster img {
+          aspect-ratio: ${cssAspectRatio};
+        }
         .hidden {
           display: none;
+        }
+        /* Play Button Styles */
+        .play-button {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 60px;
+          height: 60px;
+          background: var(--play-button-bg);
+          border: none;
+          border-radius: 50%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          cursor: pointer;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+          transition: background 0.3s, box-shadow 0.3s;
+        }
+        .play-button::before {
+          content: '';
+          display: block;
+          width: 0;
+          height: 0;
+          margin-left: 2px; /* Nudge right for visual centering */
+          border-left: 18px solid var(--play-button-arrow);
+          border-top: 10px solid transparent;
+          border-bottom: 10px solid transparent;
+        }
+        .play-button:hover {
+          background: var(--play-button-bg-hover);
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
       </style>
       <div class="video-wrapper">
@@ -159,13 +213,13 @@ export class VideoPlayer extends HTMLElement {
       </div>
     `
 
-        // Attach both click and keydown listeners to elements with role="button"
+        // Attach click and keydown listeners to interactive elements
         const clickTargets =
             this.shadowRoot!.querySelectorAll('[role="button"]')
         clickTargets.forEach((el) => {
             const handler = () => {
                 this._playerType = this._detectPlayerType(src)
-                // For YouTube and self-hosted, if poster exists, emit video-play immediately
+                // For YouTube and self-hosted, if a poster exists, emit video-play immediately
                 if (
                     this.shadowRoot!.querySelector('.poster') &&
                     this._playerType !== 'vimeo'
@@ -340,6 +394,7 @@ export class VideoPlayer extends HTMLElement {
         video.addEventListener('pause', () => this._emitEvent('video-pause'))
         video.addEventListener('ended', () => this._emitEvent('video-ended'))
 
+        // Keep focus on the video for keyboard toggling
         video.focus()
     }
 
