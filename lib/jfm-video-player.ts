@@ -1,4 +1,14 @@
+/// <reference lib="dom" />
+
+// If you have global YT or Vimeo APIs, declare them for TS:
+// Alternatively, you can define them in a separate .d.ts file.
+declare var YT: any
+declare var Vimeo: any
+
 export class VideoPlayer extends HTMLElement {
+    private _playerType: 'self-hosted' | 'youtube' | 'vimeo' = 'self-hosted'
+    // Removed _currentSrc guard to avoid blocking rendering
+
     static get observedAttributes() {
         return [
             'src',
@@ -16,6 +26,7 @@ export class VideoPlayer extends HTMLElement {
     constructor() {
         super()
         this.attachShadow({ mode: 'open' })
+        this._playerType = 'self-hosted'
         this._render()
     }
 
@@ -29,7 +40,28 @@ export class VideoPlayer extends HTMLElement {
         }
     }
 
-    _render() {
+    private _emitEvent(eventName: string) {
+        this.dispatchEvent(
+            new CustomEvent(eventName, {
+                detail: {
+                    type: this._playerType,
+                    src: this.getAttribute('src'),
+                },
+                bubbles: true,
+                composed: true,
+            })
+        )
+    }
+
+    private _detectPlayerType(
+        src: string
+    ): 'youtube' | 'vimeo' | 'self-hosted' {
+        if (/youtube\.com|youtu\.be/.test(src)) return 'youtube'
+        if (/vimeo\.com/.test(src)) return 'vimeo'
+        return 'self-hosted'
+    }
+
+    private _render() {
         const src = this.getAttribute('src') || ''
         const sources = this.hasAttribute('sources')
             ? this.getAttribute('sources')!
@@ -117,37 +149,6 @@ export class VideoPlayer extends HTMLElement {
         .hidden {
           display: none;
         }
-        .play-button {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 60px;
-          height: 60px;
-          background: var(--play-button-bg, rgba(255, 255, 255, 0.8));
-          border-radius: 50%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          border: none;
-          cursor: pointer;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-          transition: background 0.3s, box-shadow 0.3s;
-        }
-        .play-button::before {
-          content: '';
-          display: block;
-          width: 0;
-          height: 0;
-          margin-left: 2px;
-          border-left: 18px solid var(--play-button-arrow, #000);
-          border-top: 10px solid transparent;
-          border-bottom: 10px solid transparent;
-        }
-        .play-button:hover {
-          background: var(--play-button-bg-hover, rgba(255, 255, 255, 1));
-          box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
       </style>
       <div class="video-wrapper">
         ${posterHTML}
@@ -159,34 +160,32 @@ export class VideoPlayer extends HTMLElement {
         const clickTargets =
             this.shadowRoot!.querySelectorAll('[role="button"]')
         clickTargets.forEach((el) => {
-            el?.addEventListener('click', () =>
+            el?.addEventListener('click', () => {
+                // Set the correct player type before loading video
+                this._playerType = this._detectPlayerType(src)
                 this._loadVideo({
                     src,
                     sources,
-                    allowFullscreen,
+                    allowFullscreen: !!allowFullscreen,
                     autoplay: true,
                 })
-            )
-            el?.addEventListener('keydown', (e) => {
-                const key = (e as KeyboardEvent).key
-                if (key === 'Enter' || key === ' ') {
-                    e.preventDefault()
-                    this._loadVideo({
-                        src,
-                        sources,
-                        allowFullscreen,
-                        autoplay: true,
-                    })
-                }
             })
         })
 
+        // If no poster exists, load immediately
         if (!posterHTML) {
-            this._loadVideo({ src, sources, allowFullscreen, autoplay: false })
+            this._playerType = this._detectPlayerType(src)
+            this._emitEvent('video-load')
+            this._loadVideo({
+                src,
+                sources,
+                allowFullscreen: !!allowFullscreen,
+                autoplay: false,
+            })
         }
     }
 
-    _loadVideo({
+    private _loadVideo({
         src,
         sources,
         allowFullscreen,
@@ -204,17 +203,27 @@ export class VideoPlayer extends HTMLElement {
         const allowAttrs = `allow="${autoplay ? 'autoplay' : ''}"`
         const fullscreenAttr = allowFullscreen ? 'allowfullscreen' : ''
 
+        // YouTube
         if (/youtube\.com|youtu\.be/.test(src)) {
+            this._playerType = 'youtube'
             const videoId = this._extractYouTubeID(src)
-            embedHTML = `<iframe src="https://www.youtube.com/embed/${videoId}${
-                autoplay ? '?autoplay=1' : ''
+            embedHTML = `<iframe id="ytPlayer" src="https://www.youtube.com/embed/${videoId}?enablejsapi=1${
+                autoplay ? '&autoplay=1' : ''
             }" frameborder="0" ${allowAttrs} ${fullscreenAttr} title="YouTube Video"></iframe>`
-        } else if (/vimeo\.com/.test(src)) {
+            setTimeout(() => this._setupYouTubePlayer(), 500)
+        }
+        // Vimeo
+        else if (/vimeo\.com/.test(src)) {
+            this._playerType = 'vimeo'
             const videoId = this._extractVimeoID(src)
-            embedHTML = `<iframe src="https://player.vimeo.com/video/${videoId}${
-                autoplay ? '?autoplay=1' : ''
+            embedHTML = `<iframe id="vimeoPlayer" src="https://player.vimeo.com/video/${videoId}?${
+                autoplay ? 'autoplay=1' : ''
             }" frameborder="0" ${allowAttrs} ${fullscreenAttr} title="Vimeo Video"></iframe>`
-        } else {
+            setTimeout(() => this._setupVimeoPlayer(), 500)
+        }
+        // Self-hosted
+        else {
+            this._playerType = 'self-hosted'
             let sourcesHTML = ''
             if (sources) {
                 try {
@@ -227,33 +236,83 @@ export class VideoPlayer extends HTMLElement {
                     console.warn('Invalid JSON in sources attribute:', e)
                 }
             }
-
-            embedHTML = `<video ${
+            embedHTML = `<video id="selfHostedPlayer" ${
                 autoplay ? 'autoplay' : ''
-            } controls aria-label="Self-hosted Video">
+            } controls>
         ${sourcesHTML || `<source src="${src}" type="video/mp4">`}
         Your browser does not support the video tag.
       </video>`
+            setTimeout(() => this._setupSelfHostedPlayer(), 500)
         }
 
         container.innerHTML = embedHTML
         container.classList.remove('hidden')
 
+        // Hide poster and play button
         const posterEl = this.shadowRoot!.querySelector('.poster')
         posterEl?.classList.add('hidden')
-
         const playBtn = this.shadowRoot!.querySelector('.play-button')
         playBtn?.classList.add('hidden')
     }
 
-    _extractYouTubeID(url:string) {
+    private _setupYouTubePlayer() {
+        const iframe = this.shadowRoot!.querySelector(
+            '#ytPlayer'
+        ) as HTMLIFrameElement
+        if (!iframe) return
+
+        new YT.Player(iframe, {
+            events: {
+                onStateChange: (event: any) => {
+                    if (event.data === YT.PlayerState.PLAYING)
+                        this._emitEvent('video-play')
+                    if (event.data === YT.PlayerState.PAUSED)
+                        this._emitEvent('video-pause')
+                    if (event.data === YT.PlayerState.ENDED)
+                        this._emitEvent('video-ended')
+                },
+            },
+        })
+    }
+
+    private _vimeoPlayer: any
+    private _setupVimeoPlayer() {
+        const iframe = this.shadowRoot!.querySelector(
+            '#vimeoPlayer'
+        ) as HTMLIFrameElement
+        if (!iframe) return
+
+        if (this._vimeoPlayer) {
+            this._vimeoPlayer.off('play')
+            this._vimeoPlayer.off('pause')
+            this._vimeoPlayer.off('ended')
+        }
+
+        this._vimeoPlayer = new Vimeo.Player(iframe)
+        this._vimeoPlayer.on('play', () => this._emitEvent('video-play'))
+        this._vimeoPlayer.on('pause', () => this._emitEvent('video-pause'))
+        this._vimeoPlayer.on('ended', () => this._emitEvent('video-ended'))
+    }
+
+    private _setupSelfHostedPlayer() {
+        const video = this.shadowRoot!.querySelector(
+            '#selfHostedPlayer'
+        ) as HTMLVideoElement
+        if (!video) return
+
+        video.addEventListener('play', () => this._emitEvent('video-play'))
+        video.addEventListener('pause', () => this._emitEvent('video-pause'))
+        video.addEventListener('ended', () => this._emitEvent('video-ended'))
+    }
+
+    private _extractYouTubeID(url: string): string {
         const regExp =
-            /(?:youtube\.com\/(?:shorts\/|watch\?v=|embed\/)|youtu\.be\/)([^"&?/\s]{11})/
+            /(?:youtube\.com\/(?:shorts\/|watch\?v=|embed\/)|youtu\.be\/)([^"&?\/\s]{11})/
         const match = url.match(regExp)
         return match ? match[1] : ''
     }
 
-    _extractVimeoID(url:string) {
+    private _extractVimeoID(url: string): string {
         const regExp = /vimeo\.com\/(?:video\/)?(\d+)/
         const match = url.match(regExp)
         return match ? match[1] : ''
