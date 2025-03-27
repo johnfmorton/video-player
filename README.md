@@ -10,6 +10,28 @@ A fully customizable and responsive Web Component that supports:
 
 ---
 
+## Installation
+
+```sh
+npm install jfm-video-player
+```
+
+## Usage
+
+Import and register the component in your JavaScript file:
+
+```js
+import { registerVideoPlayer } from 'jfm-video-player'
+registerVideoPlayer()
+// or registerVideoPlayer('my-video-player')
+```
+
+Then use it in your HTML:
+
+```html
+<video-player src="video.mp4"></video-player>
+```
+
 ## 🚀 Features
 
 ### ✅ Smart Video Source Detection
@@ -65,6 +87,18 @@ Use the `allowfullscreen` attribute:
 ```html
 <video-player allowfullscreen></video-player>
 ```
+
+### ✅ Normalized Events
+
+The <video-player> component now normalizes events across different video player implementations, ensuring a unified experience. Supported events include:
+
+* `play`
+* `pause`
+* `ended`
+* `timeupdate`
+* `error`
+
+This allows developers to handle events consistently, regardless of the underlying video player technology.
 
 ### ✅ Flexible Layout with `autosize`
 Make the component stretch to fill its container:
