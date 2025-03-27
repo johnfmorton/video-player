@@ -184,4 +184,4 @@ MIT
 ---
 
 ## ✨ Credits
-Created by [Your Name]. Contributions welcome!
+Created by John F Morton. Contributions welcome!
