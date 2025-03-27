@@ -190,6 +190,7 @@ export class VideoPlayer extends HTMLElement {
           cursor: pointer;
           box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
           transition: background 0.3s, box-shadow 0.3s;
+          pointer-events: none;
         }
         .play-button::before {
           content: '';
@@ -201,7 +202,7 @@ export class VideoPlayer extends HTMLElement {
           border-top: 10px solid transparent;
           border-bottom: 10px solid transparent;
         }
-        .play-button:hover {
+        .video-wrapper:hover .play-button {
           background: var(--play-button-bg-hover);
           box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
