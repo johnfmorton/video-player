@@ -156,13 +156,13 @@ export class VideoPlayer extends HTMLElement {
       </div>
     `
 
+        // Attach both click and keydown listeners to elements with role="button"
         const clickTargets =
             this.shadowRoot!.querySelectorAll('[role="button"]')
         clickTargets.forEach((el) => {
             el?.addEventListener('click', () => {
-                // Set the correct player type first
                 this._playerType = this._detectPlayerType(src)
-                // If a poster exists and the player is not Vimeo, emit video-play immediately
+                // For YouTube and self-hosted, if poster exists, keyboard user should trigger video-play
                 if (
                     this.shadowRoot!.querySelector('.poster') &&
                     this._playerType !== 'vimeo'
@@ -175,6 +175,25 @@ export class VideoPlayer extends HTMLElement {
                     allowFullscreen: !!allowFullscreen,
                     autoplay: true,
                 })
+            })
+            el?.addEventListener('keydown', (e) => {
+                const key = (e as KeyboardEvent).key
+                if (key === 'Enter' || key === ' ') {
+                    e.preventDefault()
+                    this._playerType = this._detectPlayerType(src)
+                    if (
+                        this.shadowRoot!.querySelector('.poster') &&
+                        this._playerType !== 'vimeo'
+                    ) {
+                        this._emitEvent('video-play')
+                    }
+                    this._loadVideo({
+                        src,
+                        sources,
+                        allowFullscreen: !!allowFullscreen,
+                        autoplay: true,
+                    })
+                }
             })
         })
 
