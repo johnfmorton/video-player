@@ -1,23 +1,22 @@
 {
     "name": "jfm-video-player",
-    "version": "1.0.0",
-    "description": "This is a templare repo that will create a Vite workflow to ease creation of Javascript modules with a dev server, GitHub Pages support and automated publishing to NPM.",
+    "version": "1.0.0.beta.1",
+    "description": "A web component for playing videos with suport for YouTube, Vimeo and self-hosted video.",
     "files": [
         "dist"
     ],
-    "main": "./dist/jfm-video-player.umd.js",
+    "type": "module",
+    "module": "./dist/jfm-video-player.es.js",
+    "types": "./dist/jfm-video-player.d.ts",
+    "unpkg": "./dist/jfm-video-player.es.js",
+    "exports": {
+        ".": {
+            "import": "./dist/jfm-video-player.es.js"
+        }
+    },
     "repository": {
         "type": "git",
         "url": "https://github.com/johnfmorton/jfm-video-player"
-    },
-    "module": "./dist/jfm-video-player.es.js",
-    "unpkg": "./dist/jfm-video-player.es.js",
-    "types": "./dist/jfm-video-player.d.ts",
-    "exports": {
-        ".": {
-            "import": "./dist/jfm-video-player.es.js",
-            "require": "./dist/jfm-video-player.umd.js"
-        }
     },
     "scripts": {
         "clean": "rm -rf dist demo",
