@@ -1,22 +1,22 @@
 {
-    "name": "jfm-video-player",
+    "name": "video-player",
     "version": "1.0.0.beta.1",
     "description": "A web component for playing videos with suport for YouTube, Vimeo and self-hosted video.",
     "files": [
         "dist"
     ],
     "type": "module",
-    "module": "./dist/jfm-video-player.es.js",
-    "types": "./dist/jfm-video-player.d.ts",
-    "unpkg": "./dist/jfm-video-player.es.js",
+    "module": "./dist/video-player.es.js",
+    "types": "./dist/video-player.d.ts",
+    "unpkg": "./dist/video-player.es.js",
     "exports": {
         ".": {
-            "import": "./dist/jfm-video-player.es.js"
+            "import": "./dist/video-player.es.js"
         }
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/johnfmorton/jfm-video-player"
+        "url": "https://github.com/johnfmorton/video-player"
     },
     "scripts": {
         "clean": "rm -rf dist demo",
@@ -36,7 +36,7 @@
         "github-pages",
         "npm-publish"
     ],
-    "author": "John F. Morton <john@johnfmorton.com> (https://supergeekery.com)",
+    "author": "John F. Morton <john@johnfmorton.com> (https://johnfmorton.com)",
     "license": "MIT",
     "devDependencies": {
         "@tailwindcss/typography": "^0.5.16",

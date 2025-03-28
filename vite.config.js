@@ -10,10 +10,10 @@ export default defineConfig(({ command }) => ({
     publicDir: command === 'serve' ? 'public' : false, // Conditional publicDir
     build: {
         lib: {
-            entry: path.resolve(__dirname, 'lib/jfm-video-player.ts'),
-            name: 'jfm-video-player',
+            entry: path.resolve(__dirname, 'lib/video-player.ts'),
+            name: 'video-player',
             formats: ['es'],
-            fileName: (format) => `jfm-video-player.${format}.js`,
+            fileName: (format) => `video-player.${format}.js`,
         },
         minify: false,
     },

@@ -5,6 +5,15 @@
 declare var YT: any;
 declare var Vimeo: any;
 
+export interface VideoEventDetail {
+  type: 'self-hosted' | 'youtube' | 'vimeo';
+  src: string | null;
+  currentTime?: number;
+  duration?: number;
+}
+
+export interface VideoPlayerEvent extends CustomEvent<VideoEventDetail> {}
+
 export class VideoPlayer extends HTMLElement {
   private _playerType: 'self-hosted' | 'youtube' | 'vimeo' = 'self-hosted';
   private _ytPlayer: any;
@@ -43,47 +52,46 @@ export class VideoPlayer extends HTMLElement {
   }
 
   private _emitEvent(eventName: string) {
-    // The YouTube branch now only fires after the player is ready (via onStateChange)
-    if (this._playerType === 'self-hosted') {
-  const video = this.shadowRoot!.querySelector('#selfHostedPlayer') as HTMLVideoElement;
-  const detail: any = {
-    type: this._playerType,
-    src: this.getAttribute('src'),
-  };
-  if (video) {
-    detail.currentTime = video.currentTime;
-    detail.duration = video.duration;
-  }
-  this.dispatchEvent(new CustomEvent(eventName, { detail, bubbles: true, composed: true }));
-} else if (this._playerType === 'youtube' && this._ytPlayer && typeof this._ytPlayer.getCurrentTime === 'function') {
-      const detail = {
-        type: this._playerType,
-        src: this.getAttribute('src'),
-        currentTime: this._ytPlayer.getCurrentTime(),
-        duration: this._ytPlayer.getDuration()
-      };
-      this.dispatchEvent(new CustomEvent(eventName, { detail, bubbles: true, composed: true }));
-    } else if (this._playerType === 'vimeo' && this._vimeoPlayer) {
-      Promise.all([
-        this._vimeoPlayer.getCurrentTime(),
-        this._vimeoPlayer.getDuration(),
-      ]).then(([currentTime, duration]) => {
-        const detail = {
-          type: this._playerType,
-          src: this.getAttribute('src'),
-          currentTime,
-          duration,
-        };
-        this.dispatchEvent(new CustomEvent(eventName, { detail, bubbles: true, composed: true }));
-      });
-    } else {
-      const detail = {
-        type: this._playerType,
-        src: this.getAttribute('src'),
-      };
-      this.dispatchEvent(new CustomEvent(eventName, { detail, bubbles: true, composed: true }));
+  if (this._playerType === 'self-hosted') {
+    const video = this.shadowRoot!.querySelector('#selfHostedPlayer') as HTMLVideoElement;
+    const detail: VideoEventDetail = {
+      type: this._playerType,
+      src: this.getAttribute('src'),
+    };
+    if (video) {
+      detail.currentTime = video.currentTime;
+      detail.duration = video.duration;
     }
+    this.dispatchEvent(new CustomEvent<VideoEventDetail>(eventName, { detail, bubbles: true, composed: true }) as VideoPlayerEvent);
+  } else if (this._playerType === 'youtube' && this._ytPlayer && typeof this._ytPlayer.getCurrentTime === 'function') {
+    const detail: VideoEventDetail = {
+      type: this._playerType,
+      src: this.getAttribute('src'),
+      currentTime: this._ytPlayer.getCurrentTime(),
+      duration: this._ytPlayer.getDuration()
+    };
+    this.dispatchEvent(new CustomEvent<VideoEventDetail>(eventName, { detail, bubbles: true, composed: true })as VideoPlayerEvent);
+  } else if (this._playerType === 'vimeo' && this._vimeoPlayer) {
+    Promise.all([
+      this._vimeoPlayer.getCurrentTime(),
+      this._vimeoPlayer.getDuration(),
+    ]).then(([currentTime, duration]) => {
+      const detail: VideoEventDetail = {
+        type: this._playerType,
+        src: this.getAttribute('src'),
+        currentTime,
+        duration,
+      };
+      this.dispatchEvent(new CustomEvent<VideoEventDetail>(eventName, { detail, bubbles: true, composed: true }) as VideoPlayerEvent);
+    });
+  } else {
+    const detail: VideoEventDetail = {
+      type: this._playerType,
+      src: this.getAttribute('src'),
+    };
+    this.dispatchEvent(new CustomEvent<VideoEventDetail>(eventName, { detail, bubbles: true, composed: true })as VideoPlayerEvent);
   }
+}
 
   private _detectPlayerType(src: string): 'youtube' | 'vimeo' | 'self-hosted' {
     if (/youtube\.com|youtu\.be/.test(src)) return 'youtube';
