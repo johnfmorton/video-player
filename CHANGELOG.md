@@ -7,17 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Updated demo page styles for small screens.
-- tsconfig.json: Added `lib` property to include `DOM.Iterable`.
-- tsconfig.json: Added `forceConsistentCasingInFileNames` property set to `true`.
-- Added a note about Tailwind CSS not being included in the published module to the README.md file.
+- WIP
 
-## [1.0.0] - 2023-03-04
+## [1.0.0-beta.2] - 2025-03-28
 
-- Cleaned up documentation.
-- Publishing version 1 after testing the workflow.
+- Initial release of the `video-player` web component as beta 2.
 
-## [1.0.0-alpha.1] - 2023-03-01
+## [1.0.0-beta.1] - 2023-03-01
 
 ### Added
 
