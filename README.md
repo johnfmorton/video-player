@@ -13,7 +13,7 @@ A fully customizable and responsive Web Component that supports:
 ## Installation
 
 ```sh
-npm install jfm-video-player
+npm install @morton-studio/video-player
 ```
 
 ## Usage
@@ -21,7 +21,7 @@ npm install jfm-video-player
 Import and register the component in your JavaScript file:
 
 ```js
-import { registerVideoPlayer } from 'jfm-video-player'
+import { registerVideoPlayer } from 'video-player'
 registerVideoPlayer()
 // or registerVideoPlayer('my-video-player')
 ```
