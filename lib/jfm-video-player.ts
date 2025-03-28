@@ -45,22 +45,23 @@ export class VideoPlayer extends HTMLElement {
   private _emitEvent(eventName: string) {
     // The YouTube branch now only fires after the player is ready (via onStateChange)
     if (this._playerType === 'self-hosted') {
-      const video = this.shadowRoot!.querySelector('#selfHostedPlayer') as HTMLVideoElement;
-      const detail = {
-        type: this._playerType,
-        src: this.getAttribute('src'),
-        currentTime: video ? video.currentTime : 0,
-        duration: video ? video.duration : 0,
-      };
-      this.dispatchEvent(new CustomEvent(eventName, { detail, bubbles: true, composed: true }));
-    } else if (this._playerType === 'youtube' && this._ytPlayer && typeof this._ytPlayer.getCurrentTime === 'function') {
+  const video = this.shadowRoot!.querySelector('#selfHostedPlayer') as HTMLVideoElement;
+  const detail: any = {
+    type: this._playerType,
+    src: this.getAttribute('src'),
+  };
+  if (video) {
+    detail.currentTime = video.currentTime;
+    detail.duration = video.duration;
+  }
+  this.dispatchEvent(new CustomEvent(eventName, { detail, bubbles: true, composed: true }));
+} else if (this._playerType === 'youtube' && this._ytPlayer && typeof this._ytPlayer.getCurrentTime === 'function') {
       const detail = {
         type: this._playerType,
         src: this.getAttribute('src'),
         currentTime: this._ytPlayer.getCurrentTime(),
         duration: this._ytPlayer.getDuration()
       };
-      //debugger;
       this.dispatchEvent(new CustomEvent(eventName, { detail, bubbles: true, composed: true }));
     } else if (this._playerType === 'vimeo' && this._vimeoPlayer) {
       Promise.all([
