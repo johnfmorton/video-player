@@ -5,10 +5,7 @@
 import Notify from 'simple-notify'
 import 'simple-notify/dist/simple-notify.css'
 
-import {
-    registerVideoPlayer,
-    VideoEventDetail,
-} from '../lib/video-player'
+import { registerVideoPlayer, VideoEventDetail } from '../lib/video-player'
 registerVideoPlayer()
 
 import './style.pcss'
@@ -30,11 +27,12 @@ document.addEventListener('DOMContentLoaded', () => {
             videoPlayerYT.addEventListener(eventName, (event: Event) => {
                 const customEvent = event as CustomEvent<VideoEventDetail>
                 console.log(`Event: ${eventName}`, customEvent.detail)
-                new Notify({
-                    title:
-                        eventName + ' on ' + customEvent.detail.type,
-                    text: 'src: ' + customEvent.detail.src + ' / time: ' + (customEvent.detail.currentTime ?? 'no time available'),
-                })
+                const title = eventName + ' on ' + customEvent.detail.type
+                const time =
+                    customEvent.detail.currentTime ? (customEvent.detail.currentTime + ' sec') : 'no time available'
+                const text =
+                    'src: ' + customEvent.detail.src + ' / time: ' + time
+                showNotice(title, text)
             })
         })
     } else {
@@ -50,13 +48,15 @@ document.addEventListener('DOMContentLoaded', () => {
         ]
 
         events.forEach((eventName) => {
-          videoPlayerVimeo.addEventListener(eventName, (event) => {
-              const customEvent = event as CustomEvent<VideoEventDetail>
+            videoPlayerVimeo.addEventListener(eventName, (event) => {
+                const customEvent = event as CustomEvent<VideoEventDetail>
                 console.log(`Event: ${eventName}`, customEvent.detail)
-                new Notify({
-                    title: eventName + ' on ' + customEvent.detail.type,
-                    text: 'src: ' + customEvent.detail.src + ' / time: ' + (customEvent.detail.currentTime ?? 'no time available'),
-                })
+                const title = eventName + ' on ' + customEvent.detail.type
+                const time =
+                    customEvent.detail.currentTime ? (customEvent.detail.currentTime + ' sec') : 'no time available'
+                const text =
+                    'src: ' + customEvent.detail.src + ' / time: ' + time
+                showNotice(title, text)
             })
         })
     } else {
@@ -72,13 +72,15 @@ document.addEventListener('DOMContentLoaded', () => {
         ]
 
         events.forEach((eventName) => {
-          videoPlayerSelfHosted.addEventListener(eventName, (event) => {
-              const customEvent = event as CustomEvent<VideoEventDetail>
+            videoPlayerSelfHosted.addEventListener(eventName, (event) => {
+                const customEvent = event as CustomEvent<VideoEventDetail>
                 console.log(`Event: ${eventName}`, customEvent.detail)
-                new Notify({
-                    title: eventName + ' on ' + customEvent.detail.type,
-                    text: 'src: ' + customEvent.detail.src + ' / time: ' + (customEvent.detail.currentTime ?? 'no time available'),
-                })
+                const title = eventName + ' on ' + customEvent.detail.type
+                const time =
+                    customEvent.detail.currentTime ? (customEvent.detail.currentTime + ' sec') : 'no time available'
+                const text =
+                    'src: ' + customEvent.detail.src + ' / time: ' + time
+                showNotice(title, text)
             })
         })
     } else {
@@ -94,16 +96,30 @@ document.addEventListener('DOMContentLoaded', () => {
         ]
 
         events.forEach((eventName) => {
-          videoPlayerYTshort.addEventListener(eventName, (event) => {
-              const customEvent = event as CustomEvent<VideoEventDetail>
+            videoPlayerYTshort.addEventListener(eventName, (event) => {
+                const customEvent = event as CustomEvent<VideoEventDetail>
                 console.log(`Event: ${eventName}`, customEvent.detail)
-                new Notify({
-                    title: eventName + ' on ' + customEvent.detail.type,
-                    text: 'src: ' + customEvent.detail.src + ' / time: ' + (customEvent.detail.currentTime ?? 'no time available'),
-                })
+                const title = eventName + ' on ' + customEvent.detail.type
+                const time =
+                    customEvent.detail.currentTime ? (customEvent.detail.currentTime + ' sec') : 'no time available'
+                const text =
+                    'src: ' + customEvent.detail.src + ' / time: ' + time
+                showNotice(title, text)
             })
         })
     } else {
         console.warn("Video player with ID 'self-hosted-example' not found.")
     }
 })
+
+// showNotice function
+const showNotice = (title: string, text: string) => {
+    new Notify({
+        title: title,
+        text: text,
+        status: 'success',
+        effect: 'slide',
+        autoclose: true,
+        autotimeout: 6500,
+    })
+}
