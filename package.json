@@ -1,12 +1,13 @@
 {
     "name": "@morton-studio/video-player",
-    "version": "1.0.0-beta.3",
+    "version": "1.0.0-beta.4",
     "description": "A web component for playing videos with suport for YouTube, Vimeo and self-hosted video.",
     "files": [
         "dist"
     ],
     "type": "module",
     "module": "./dist/video-player.es.js",
+    "homepage": "https://johnfmorton.github.io/video-player/",
     "types": "./dist/video-player.d.ts",
     "unpkg": "./dist/video-player.es.js",
     "exports": {
