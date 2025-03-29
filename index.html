@@ -41,7 +41,7 @@
                                 src="/cat-head-rub.mp4" &lt;-- Can be a YouTube or Vimeo URL or a self-hosted video
                                 allowfullscreen &lt;-- Optional
                                 aspect-ratio="9x16" &lt;-- Default is 16x9
-                                poster="/self-hosted-9x16.jpg" &lt;-- Optional
+                                poster="self-hosted-9x16.jpg" &lt;-- Optional
                                 playbutton &lt;-- Optional
 
                                 >&lt;/video-player>
@@ -53,26 +53,26 @@
           <div class="w-1/2">
             <h2 class="text-lg mb-1">YouTube example</h2>
             <video-player src="https://www.youtube.com/watch?v=dQw4w9WgXcQ" allowfullscreen class="flex-1" aspect-ratio="16x9" playbutton posters='{
-                      "webp": "/youtube-hosted-16x9.webp",
-                      "jpg": "/youtube-hosted-16x9.jpg",
-                      "png": "/youtube-hosted-16x9.png"
+                      "webp": "youtube-hosted-16x9.webp",
+                      "jpg": "youtube-hosted-16x9.jpg",
+                      "png": "youtube-hosted-16x9.png"
                     }' id="youtube-example"></video-player>
 
           </div>
           <div class="w-1/2">
             <h2 class="text-lg mb-1">Vimeo example</h2>
-            <video-player src="https://vimeo.com/183913643" poster="/vimeo-hosted-16x9.jpg" allowfullscreen id="vimeo-example"></video-player>
+            <video-player src="https://vimeo.com/183913643" poster="vimeo-hosted-16x9.jpg" allowfullscreen id="vimeo-example"></video-player>
           </div>
         </div>
 
            <div class="flex flex-row gap-3">
             <div class="w-1/2">
               <h2 class="text-lg mb-1">Self-hosted video example</h2>
-              <video-player src="/cat-head-rub.mp4" allowfullscreen aspect-ratio="9x16" playbutton poster="/self-hosted-9x16.jpg" id="self-hosted-example"></video-player>
+              <video-player src="cat-head-rub.mp4" allowfullscreen aspect-ratio="9x16" playbutton poster="self-hosted-9x16.jpg" id="self-hosted-example"></video-player>
             </div>
           <div class="w-1/2">
             <h2 class="text-lg mb-1">YouTube Shorts video example</h2>
-          <video-player src="https://www.youtube.com/shorts/L2-OiwKDflU" allowfullscreen aspect-ratio="9x16" poster="/youtube-shorts-9x16.jpg" id="youtube-short-example"></video-player>
+          <video-player src="https://www.youtube.com/shorts/L2-OiwKDflU" allowfullscreen aspect-ratio="9x16" poster="youtube-shorts-9x16.jpg" id="youtube-short-example"></video-player>
           </div>
         </div>
 
