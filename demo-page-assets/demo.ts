@@ -32,8 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log(`Event: ${eventName}`, customEvent.detail)
                 new Notify({
                     title:
-                        'Event ' + eventName + ' on ' + customEvent.detail.type,
-                    text: 'src: ' + customEvent.detail.src,
+                        eventName + ' on ' + customEvent.detail.type,
+                    text: 'src: ' + customEvent.detail.src + ' / time: ' + (customEvent.detail.currentTime ?? 'no time available'),
                 })
             })
         })
@@ -54,8 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
               const customEvent = event as CustomEvent<VideoEventDetail>
                 console.log(`Event: ${eventName}`, customEvent.detail)
                 new Notify({
-                    title: 'Event ' + eventName + ' on ' + customEvent.detail.type,
-                    text: 'src: ' + customEvent.detail.src,
+                    title: eventName + ' on ' + customEvent.detail.type,
+                    text: 'src: ' + customEvent.detail.src + ' / time: ' + (customEvent.detail.currentTime ?? 'no time available'),
                 })
             })
         })
@@ -76,8 +76,8 @@ document.addEventListener('DOMContentLoaded', () => {
               const customEvent = event as CustomEvent<VideoEventDetail>
                 console.log(`Event: ${eventName}`, customEvent.detail)
                 new Notify({
-                    title: 'Event ' + eventName + ' on ' + customEvent.detail.type,
-                    text: 'src: ' + customEvent.detail.src,
+                    title: eventName + ' on ' + customEvent.detail.type,
+                    text: 'src: ' + customEvent.detail.src + ' / time: ' + (customEvent.detail.currentTime ?? 'no time available'),
                 })
             })
         })
@@ -98,8 +98,8 @@ document.addEventListener('DOMContentLoaded', () => {
               const customEvent = event as CustomEvent<VideoEventDetail>
                 console.log(`Event: ${eventName}`, customEvent.detail)
                 new Notify({
-                    title: 'Event ' + eventName + ' on ' + customEvent.detail.type,
-                    text: 'src: ' + customEvent.detail.src,
+                    title: eventName + ' on ' + customEvent.detail.type,
+                    text: 'src: ' + customEvent.detail.src + ' / time: ' + (customEvent.detail.currentTime ?? 'no time available'),
                 })
             })
         })
