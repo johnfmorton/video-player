@@ -1,10 +1,10 @@
 /**
  * name: @morton-studio/video-player
- * version: v1.0.0-beta.3
+ * version: v1.0.0-beta.4
  * description: A web component for playing videos with suport for YouTube, Vimeo and self-hosted video.
  * author: John F. Morton <john@johnfmorton.com> (https://johnfmorton.com)
  * repository: git+https://github.com/johnfmorton/video-player.git
- * build date: 2025-03-29T17:36:34.237Z
+ * build date: 2025-03-29T17:40:35.700Z
  */
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
