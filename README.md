@@ -12,6 +12,10 @@ A fully customizable and responsive Web Component that supports:
 
 ## Installation
 
+The `video-player` component is available via npm at https://www.npmjs.com/package/@morton-studio/video-player.
+
+You can install it using:
+
 ```sh
 npm install @morton-studio/video-player
 ```

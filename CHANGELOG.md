@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - WIP
 
+## [1.0.0-beta.3] - 2025-03-28
+
+- No code changes in the web component. Documentation work in progress.
+
 ## [1.0.0-beta.2] - 2025-03-28
 
 - Initial release of the `video-player` web component as beta 2.
