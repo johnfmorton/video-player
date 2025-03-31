@@ -279,6 +279,16 @@ export class VideoPlayer extends HTMLElement {
       </div>
     `
 
+         this._playerType = this._detectPlayerType(src)
+         this._emitEvent('video-load')
+         this._loadVideo({
+             src,
+             sources,
+             allowFullscreen: !!allowFullscreen,
+             autoplay: false,
+             removeOverlay: false,
+         })
+
         // Attach both click and keydown listeners to interactive elements
         const clickTargets =
             this.shadowRoot!.querySelectorAll('[role="button"]')
@@ -298,7 +308,8 @@ export class VideoPlayer extends HTMLElement {
                 // Vimeo block
                 if (this._playerType === 'vimeo') {
                     // Add any Vimeo-specific logic here.
-                    debugger
+                  debugger
+                  this._vimeoPlayer.play()
                 }
 
                 // Self-hosted block
@@ -356,11 +367,13 @@ export class VideoPlayer extends HTMLElement {
         sources,
         allowFullscreen,
         autoplay,
+        removeOverlay = true,
     }: {
         src: string
         sources?: string
         allowFullscreen: boolean
         autoplay: boolean
+        removeOverlay?: boolean
     }) {
         const container = this.shadowRoot!.querySelector('.video-container')
         if (!container) return
@@ -412,12 +425,15 @@ export class VideoPlayer extends HTMLElement {
         }
 
         container.innerHTML = embedHTML
-        container.classList.remove('hidden')
+        // container.classList.remove('hidden')
 
-        const posterEl = this.shadowRoot!.querySelector('.poster')
-        posterEl?.classList.add('hidden')
-        const playBtn = this.shadowRoot!.querySelector('.play-button')
-        playBtn?.classList.add('hidden')
+        if (removeOverlay) {
+            const posterEl = this.shadowRoot!.querySelector('.poster')
+            posterEl?.classList.add('hidden')
+            const playBtn = this.shadowRoot!.querySelector('.play-button')
+          playBtn?.classList.add('hidden')
+          container.classList.remove('hidden')
+        }
     }
 
     private _setupYouTubePlayer() {

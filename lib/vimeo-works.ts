@@ -308,12 +308,12 @@ export class VideoPlayer extends HTMLElement {
                     this.shadowRoot!.querySelector('.video-container')
                 container?.classList.remove('hidden')
 
-                if (this._playerType === 'youtube') {
-                    console.log('YouTube player type detected', this._ytPlayer)
-                    console.log(
-                        'YouTube player playVideo:',
-                        this._ytPlayer.playVideo
-                    )
+              if (this._playerType === 'youtube') {
+                console.log('YouTube player type detected', this._ytPlayer);
+                console.log(
+                    'YouTube player playVideo:',
+                    this._ytPlayer.playVideo
+                )
                     debugger
                     // If the YouTube player instance exists and has a playVideo function
                     if (
