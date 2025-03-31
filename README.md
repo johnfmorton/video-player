@@ -36,6 +36,21 @@ Then use it in your HTML:
 <video-player src="video.mp4"></video-player>
 ```
 
+### Recommended: Install the YouTube API and Vimeo API
+
+To enable the YouTube and Vimeo APIs, install the following packages in your project:
+
+```
+<!-- YouTube iFrame API, if needed -->
+<script src="https://www.youtube.com/iframe_api"></script>
+<!-- Vimeo API, if needed -->
+<script src="https://player.vimeo.com/api/player.js"></script>
+```
+
+You only need to include the YouTube API and Vimeo API if you plan to use the YouTube or Vimeo video sources. If you are only using self-hosted videos, you can skip this step.
+
+The web component will automatically detect the video source and load the appropriate API if needed by looking on the Window object for `YT` or `Vimeo`.  If you do it yourself, the plugin will be able to use the API directly instead of loading it via the plugin.
+
 ## 🚀 Features
 
 ### ✅ Smart Video Source Detection

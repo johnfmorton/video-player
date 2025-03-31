@@ -12,6 +12,13 @@ export interface VideoEventDetail {
     duration?: number
 }
 
+declare global {
+    interface Window {
+        YT?: any
+        Vimeo?: any
+    }
+}
+
 export interface VideoPlayerEvent extends CustomEvent<VideoEventDetail> {}
 
 // VideoPlayer Custom Element: Manages video playback from self-hosted, YouTube, and Vimeo sources.
@@ -290,6 +297,22 @@ export class VideoPlayer extends HTMLElement {
     `
 
         this._playerType = this._detectPlayerType(src)
+        // Dynamically load YouTube or Vimeo API if not present
+        if (this._playerType === 'youtube') {
+          if (!window.YT && !document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
+            const script = document.createElement('script');
+            script.src = 'https://www.youtube.com/iframe_api';
+            document.head.appendChild(script);
+          }
+        }
+
+        if (this._playerType === 'vimeo') {
+          if (!window.Vimeo && !document.querySelector('script[src="https://player.vimeo.com/api/player.js"]')) {
+            const script = document.createElement('script');
+            script.src = 'https://player.vimeo.com/api/player.js';
+            document.head.appendChild(script);
+          }
+        }
         this._emitEvent('video-load')
         this._loadVideo({
             src,
@@ -320,7 +343,7 @@ export class VideoPlayer extends HTMLElement {
                     console.log('YouTube player type detected', this._ytPlayer)
 
                     this._playerType = this._detectPlayerType(src)
-                    // this._emitEvent('video-load')
+
                     this._loadVideo({
                         src,
                         sources,
@@ -335,7 +358,6 @@ export class VideoPlayer extends HTMLElement {
                     ) {
                         if (this._ytPlayerReady) {
                             this._ytPlayer.playVideo()
-                            this._emitEvent('video-play')
                         } else {
                             this._playOnReady = true
                         }
@@ -475,7 +497,6 @@ export class VideoPlayer extends HTMLElement {
                     this._ytPlayerReady = true
                     if (this._playOnReady) {
                         event.target.playVideo()
-                        this._emitEvent('video-play')
                         this._playOnReady = false
                     }
                 },
