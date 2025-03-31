@@ -294,7 +294,7 @@ export class VideoPlayer extends HTMLElement {
 
         // Attach both click and keydown listeners to interactive elements
         const clickTargets =
-            this.shadowRoot!.querySelectorAll('[role="button"]')
+            this.shadowRoot!.querySelectorAll('[role="button"], .play-button')
         clickTargets.forEach((el) => {
             const handler = () => {
                 // Remove the overlay poster and play button
