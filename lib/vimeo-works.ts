@@ -310,12 +310,23 @@ export class VideoPlayer extends HTMLElement {
 
               if (this._playerType === 'youtube') {
                 console.log('YouTube player type detected', this._ytPlayer);
-                console.log(
-                    'YouTube player playVideo function:',
-                    this._ytPlayer.playVideo
-                )
-                    debugger
-                    // If the YouTube player instance exists and has a playVideo function
+                // this._emitEvent('video-play')
+                // if (!posterHTML) {
+                    this._playerType = this._detectPlayerType(src)
+                    // this._emitEvent('video-load')
+                    this._loadVideo({
+                        src,
+                        sources,
+                        allowFullscreen: !!allowFullscreen,
+                        autoplay: true,
+                    })
+                // }
+                // console.log(
+                //     'YouTube player playVideo function:',
+                //     this._ytPlayer.playVideo
+                // )
+                //     debugger
+                //     // If the YouTube player instance exists and has a playVideo function
                     if (
                         this._ytPlayer &&
                         typeof this._ytPlayer.playVideo === 'function'
