@@ -5,7 +5,7 @@
 import Notify from 'simple-notify'
 import 'simple-notify/dist/simple-notify.css'
 
-import { registerVideoPlayer, VideoEventDetail } from '../lib/vimeo-works'
+import { registerVideoPlayer, VideoEventDetail } from '../lib/video-player'
 registerVideoPlayer()
 
 import './style.pcss'
