@@ -311,7 +311,7 @@ export class VideoPlayer extends HTMLElement {
               if (this._playerType === 'youtube') {
                 console.log('YouTube player type detected', this._ytPlayer);
                 console.log(
-                    'YouTube player playVideo:',
+                    'YouTube player playVideo function:',
                     this._ytPlayer.playVideo
                 )
                     debugger
