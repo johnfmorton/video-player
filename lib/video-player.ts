@@ -19,6 +19,9 @@ export class VideoPlayer extends HTMLElement {
     private _ytPlayer: any
     private _vimeoPlayer: any
 
+    private _ytPlayerReady: boolean = false
+    private _playOnReady: boolean = false
+
     static get observedAttributes() {
         return [
             'src',
@@ -271,7 +274,7 @@ export class VideoPlayer extends HTMLElement {
           background: var(--play-button-bg-hover);
           box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
-        </style>
+      </style>
       <div class="video-wrapper">
         ${posterHTML}
         ${playButtonHTML}
@@ -279,65 +282,78 @@ export class VideoPlayer extends HTMLElement {
       </div>
     `
 
-         this._playerType = this._detectPlayerType(src)
-         this._emitEvent('video-load')
-         this._loadVideo({
-             src,
-             sources,
-             allowFullscreen: !!allowFullscreen,
-             autoplay: false,
-             removeOverlay: false,
-         })
+        this._playerType = this._detectPlayerType(src)
+        this._emitEvent('video-load')
+        this._loadVideo({
+            src,
+            sources,
+            allowFullscreen: !!allowFullscreen,
+            autoplay: false,
+            removeOverlay: false,
+        })
 
         // Attach both click and keydown listeners to interactive elements
-        const clickTargets =
-            this.shadowRoot!.querySelectorAll('[role="button"]')
+        const clickTargets = this.shadowRoot!.querySelectorAll(
+            '[role="button"], .play-button'
+        )
         clickTargets.forEach((el) => {
             const handler = () => {
-                // Detect the player type based on the src.
-                this._playerType = this._detectPlayerType(src)
+                // Remove the overlay poster and play button
+                const posterEl = this.shadowRoot!.querySelector('.poster')
+                posterEl?.classList.add('hidden')
+                const playBtn = this.shadowRoot!.querySelector('.play-button')
+                playBtn?.classList.add('hidden')
 
-                // YouTube block
+                // Unhide the video container
+                const container =
+                    this.shadowRoot!.querySelector('.video-container')
+                container?.classList.remove('hidden')
+
                 if (this._playerType === 'youtube') {
-                    if (this.shadowRoot!.querySelector('.poster')) {
-                        this._emitEvent('video-play')
+                    console.log('YouTube player type detected', this._ytPlayer)
+
+                    this._playerType = this._detectPlayerType(src)
+                    // this._emitEvent('video-load')
+                    this._loadVideo({
+                        src,
+                        sources,
+                        allowFullscreen: !!allowFullscreen,
+                        autoplay: true,
+                    })
+
+                    // If the YouTube player instance exists and has a playVideo function
+                    if (
+                        this._ytPlayer &&
+                        typeof this._ytPlayer.playVideo === 'function'
+                    ) {
+                        if (this._ytPlayerReady) {
+                            this._ytPlayer.playVideo()
+                            this._emitEvent('video-play')
+                        } else {
+                            this._playOnReady = true
+                        }
+                    } else {
+                        // YouTube player not yet instantiated; set flag to play when ready
+                        this._playOnReady = true
                     }
-                    // Add any additional YouTube-specific logic here.
+                } else if (this._playerType === 'vimeo' && this._vimeoPlayer) {
+                    this._vimeoPlayer.play()
+                    // Vimeo player's play event will trigger video-play emission
+                } else if (this._playerType === 'self-hosted') {
+                    const video = this.shadowRoot!.querySelector(
+                        '#selfHostedPlayer'
+                    ) as HTMLVideoElement
+                    video?.play()
+                    // The self-hosted player's event listener will emit video-play
                 }
-
-                // Vimeo block
-                if (this._playerType === 'vimeo') {
-                    // Add any Vimeo-specific logic here.
-                  debugger
-                  this._vimeoPlayer.play()
-                }
-
-                // Self-hosted block
-                if (this._playerType === 'self-hosted') {
-                    if (this.shadowRoot!.querySelector('.poster')) {
-                        this._emitEvent('video-play')
-                    }
-                    // Add any additional self-hosted specific logic here.
-                }
-
-                // Call loadVideo for all player types.
-                this._loadVideo({
-                    src,
-                    sources,
-                    allowFullscreen: !!allowFullscreen,
-                    autoplay: true,
-                })
             }
-
             el?.addEventListener('click', handler, { passive: true })
-
             el?.addEventListener('keydown', (e) => {
                 const key = (e as KeyboardEvent).key
                 if (key === 'Enter' || key === ' ') {
                     e.preventDefault()
                     handler()
-
-                    // For self-hosted videos, set focus on the video element after loading.
+                    // For self-hosted videos, set focus on the video element after loading
                     if (this._playerType === 'self-hosted') {
                         setTimeout(() => {
                             const video = this.shadowRoot!.querySelector(
@@ -349,17 +365,6 @@ export class VideoPlayer extends HTMLElement {
                 }
             })
         })
-
-        if (!posterHTML) {
-            this._playerType = this._detectPlayerType(src)
-            this._emitEvent('video-load')
-            this._loadVideo({
-                src,
-                sources,
-                allowFullscreen: !!allowFullscreen,
-                autoplay: false,
-            })
-        }
     }
 
     private _loadVideo({
@@ -425,14 +430,12 @@ export class VideoPlayer extends HTMLElement {
         }
 
         container.innerHTML = embedHTML
-        // container.classList.remove('hidden')
 
         if (removeOverlay) {
             const posterEl = this.shadowRoot!.querySelector('.poster')
             posterEl?.classList.add('hidden')
             const playBtn = this.shadowRoot!.querySelector('.play-button')
-          playBtn?.classList.add('hidden')
-          container.classList.remove('hidden')
+            playBtn?.classList.add('hidden')
         }
     }
 
@@ -445,13 +448,11 @@ export class VideoPlayer extends HTMLElement {
         this._ytPlayer = new YT.Player(iframe, {
             events: {
                 onReady: (event: any) => {
-                    // For YouTube, let onStateChange handle video-play emission.
-                    if (
-                        event.target &&
-                        event.target.playVideo &&
-                        iframe.src.includes('autoplay=1')
-                    ) {
+                    this._ytPlayerReady = true
+                    if (this._playOnReady) {
                         event.target.playVideo()
+                        this._emitEvent('video-play')
+                        this._playOnReady = false
                     }
                 },
                 onStateChange: (event: any) => {
