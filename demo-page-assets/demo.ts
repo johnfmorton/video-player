@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
             })
         })
     } else {
-        console.warn("Video player with ID 'self-hosted-example' not found.")
+        console.warn("Video player with ID 'youtube-short-example' not found.")
     }
 })
 
