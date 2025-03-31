@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - WIP
 
+## [1.0.0-beta.6] - 2025-03-31
+
+- Fixed duplicate play event when clicking a YouTube video that had a poster image.
+- Added autoload of YouTube or Vimeo API libraries when the `video-player` component is used. This change ensures that the necessary libraries are loaded automatically, improving the user experience and reducing potential errors related to missing libraries. You still encouraged to load them yourself, but this change makes it easier for users who may not be familiar with the process.
+
 ## [1.0.0-beta.5] - 2025-03-31
 
 - Fixed an issue with the `video-player` web component on iOS where the YouTube video would not play as expected when user clicked a poster frame. This change improves the user experience on iOS devices and ensures consistent behavior across platforms.

@@ -12,7 +12,7 @@ A fully customizable and responsive Web Component that supports:
 
 ## Installation
 
-The `video-player` component is available via npm at https://www.npmjs.com/package/@morton-studio/video-player.
+The `video-player` component is available via npm at [https://www.npmjs.com/package/@morton-studio/video-player](https://www.npmjs.com/package/@morton-studio/video-player).
 
 You can install it using:
 
@@ -40,7 +40,7 @@ Then use it in your HTML:
 
 To enable the YouTube and Vimeo APIs, install the following packages in your project:
 
-```
+```html
 <!-- YouTube iFrame API, if needed -->
 <script src="https://www.youtube.com/iframe_api"></script>
 <!-- Vimeo API, if needed -->
@@ -54,6 +54,7 @@ The web component will automatically detect the video source and load the approp
 ## 🚀 Features
 
 ### ✅ Smart Video Source Detection
+
 Automatically determines video type based on the `src` URL:
 
 - YouTube URLs (incl. Shorts): `https://www.youtube.com/watch?v=...`, `https://youtu.be/...`, `https://youtube.com/shorts/...`
@@ -61,6 +62,7 @@ Automatically determines video type based on the `src` URL:
 - Self-hosted: anything else (assumes direct video file)
 
 ### ✅ Responsive Aspect Ratios
+
 Supports predefined aspect ratios:
 
 - `16x9` (default)
@@ -69,17 +71,21 @@ Supports predefined aspect ratios:
 - `9x16`
 
 Use the `aspect-ratio` attribute:
+
 ```html
 <video-player aspect-ratio="4x3"></video-player>
 ```
 
 ### ✅ Poster Image Support
+
 Use a single image:
+
 ```html
 <video-player poster="/images/poster.jpg"></video-player>
 ```
 
 Or use multiple formats:
+
 ```html
 <video-player posters='{
   "avif": "/images/poster.avif",
@@ -90,45 +96,60 @@ Or use multiple formats:
 ```
 
 ### ✅ Custom Alt Text for Poster
+
 Use the `posteralt` attribute to improve accessibility:
+
 ```html
 <video-player posteralt="Preview image for demo clip"></video-player>
 ```
 
 ### ✅ Optional Play Button Overlay
+
 Adds a centered play icon on the poster frame:
+
 ```html
 <video-player playbutton></video-player>
 ```
 
 ### ✅ Fullscreen Toggle Support
+
 Use the `allowfullscreen` attribute:
+
 ```html
 <video-player allowfullscreen></video-player>
 ```
 
 ### ✅ Normalized Events
 
-The <video-player> component now normalizes events across different video player implementations, ensuring a unified experience. Supported events include:
+The <video-player> component normalizes events across different video player implementations, ensuring a unified experience. Supported events include:
 
-* `play`
-* `pause`
-* `ended`
-* `timeupdate`
-* `error`
+* `video-play`
+* `video-pause`
+* `video-ended`
+
+Each event is dispatched with a `detail` object containing the following properties:
+
+- `type`: The type of video service (e.g., `youtube`, `vimeo`, `self-hosted`).
+- `src`: The source URL of the video.
+- `currentTime`: The current playback time in seconds, if available.
+- `duration`: The total duration of the video in seconds, if available.
 
 This allows developers to handle events consistently, regardless of the underlying video player technology.
 
 ### ✅ Flexible Layout with `autosize`
+
 Make the component stretch to fill its container:
+
 ```html
 <video-player autosize></video-player>
 ```
+
 This is useful inside `flex` or `grid` layouts.
 
 ---
 
 ## 🎨 Custom Styles
+
 You can customize the appearance of the play button using CSS variables:
 
 ```css
@@ -144,6 +165,7 @@ These variables let you customize the style without modifying the component dire
 ---
 
 ## ♿ Accessibility
+
 This component has built-in accessibility features:
 
 - Poster images have customizable `alt` text.
@@ -155,7 +177,9 @@ This component has built-in accessibility features:
 ---
 
 ## 📦 Self-Hosted Video with Multiple Formats
+
 Use the `sources` attribute (as a JSON string):
+
 ```html
 <video-player sources='[
   { "src": "/video.mp4", "type": "video/mp4" },
@@ -168,6 +192,7 @@ Use the `sources` attribute (as a JSON string):
 ## 🧩 Examples
 
 ### YouTube (with posters and play button)
+
 ```html
 <video-player
   src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
@@ -183,6 +208,7 @@ Use the `sources` attribute (as a JSON string):
 ```
 
 ### Self-Hosted Video with Multiple Formats
+
 ```html
 <video-player
   sources='[
@@ -204,6 +230,7 @@ Use the `sources` attribute (as a JSON string):
 ---
 
 ## 🛠 Installation
+
 Include the JS file via `<script type="module">` or package it into your build system.
 
 ```html
@@ -211,12 +238,14 @@ Include the JS file via `<script type="module">` or package it into your build s
 ```
 
 Or import and register manually:
+
 ```js
 import VideoPlayer, { registerVideoPlayer } from './video-player.js';
 registerVideoPlayer();
 ```
 
 You can also customize the tag name:
+
 ```js
 registerVideoPlayer('my-video-player');
 ```
@@ -224,6 +253,7 @@ registerVideoPlayer('my-video-player');
 ---
 
 ## 🧪 Development
+
 - Written in plain TypeScript but compiles to ES6 for compatibility.
 - Uses Shadow DOM
 - No external dependencies
