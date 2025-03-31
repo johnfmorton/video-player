@@ -5,6 +5,12 @@ export interface VideoEventDetail {
     currentTime?: number;
     duration?: number;
 }
+declare global {
+    interface Window {
+        YT?: any;
+        Vimeo?: any;
+    }
+}
 export interface VideoPlayerEvent extends CustomEvent<VideoEventDetail> {
 }
 export declare class VideoPlayer extends HTMLElement {

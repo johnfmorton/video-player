@@ -1,10 +1,10 @@
 /**
  * name: @morton-studio/video-player
- * version: v1.0.0-beta.5
+ * version: v1.0.0-beta.6
  * description: A web component for playing videos with suport for YouTube, Vimeo and self-hosted video.
  * author: John F. Morton <john@johnfmorton.com> (https://johnfmorton.com)
  * repository: git+https://github.com/johnfmorton/video-player.git
- * build date: 2025-03-31T19:59:56.876Z
+ * build date: 2025-03-31T21:38:47.334Z
  */
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
@@ -233,6 +233,20 @@ class VideoPlayer extends HTMLElement {
       </div>
     `;
     this._playerType = this._detectPlayerType(src);
+    if (this._playerType === "youtube") {
+      if (!window.YT && !document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
+        const script = document.createElement("script");
+        script.src = "https://www.youtube.com/iframe_api";
+        document.head.appendChild(script);
+      }
+    }
+    if (this._playerType === "vimeo") {
+      if (!window.Vimeo && !document.querySelector('script[src="https://player.vimeo.com/api/player.js"]')) {
+        const script = document.createElement("script");
+        script.src = "https://player.vimeo.com/api/player.js";
+        document.head.appendChild(script);
+      }
+    }
     this._emitEvent("video-load");
     this._loadVideo({
       src,
@@ -264,7 +278,6 @@ class VideoPlayer extends HTMLElement {
           if (this._ytPlayer && typeof this._ytPlayer.playVideo === "function") {
             if (this._ytPlayerReady) {
               this._ytPlayer.playVideo();
-              this._emitEvent("video-play");
             } else {
               this._playOnReady = true;
             }
@@ -372,7 +385,6 @@ class VideoPlayer extends HTMLElement {
           this._ytPlayerReady = true;
           if (this._playOnReady) {
             event.target.playVideo();
-            this._emitEvent("video-play");
             this._playOnReady = false;
           }
         },
