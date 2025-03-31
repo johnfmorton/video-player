@@ -399,42 +399,57 @@ export class VideoPlayer extends HTMLElement {
         if (/youtube\.com|youtu\.be/.test(src)) {
             this._playerType = 'youtube'
             const videoId = this._extractYouTubeID(src)
-            embedHTML = `<iframe id="ytPlayer" src="https://www.youtube.com/embed/${videoId}?enablejsapi=1${
-                autoplay ? '&autoplay=1' : ''
-            }" frameborder="0" ${allowAttrs} ${fullscreenAttr} title="YouTube Video"></iframe>`
-            setTimeout(() => this._setupYouTubePlayer(), 500)
+            if (!videoId) {
+                embedHTML = `<div class="error">Invalid YouTube video URL provided.</div>`
+            } else {
+                embedHTML = `<iframe id="ytPlayer" src="https://www.youtube.com/embed/${videoId}?enablejsapi=1${
+                    autoplay ? '&autoplay=1' : ''
+                }" frameborder="0" ${allowAttrs} ${fullscreenAttr} title="YouTube Video"></iframe>`
+                setTimeout(() => this._setupYouTubePlayer(), 500)
+            }
         }
         // Vimeo
         else if (/vimeo\.com/.test(src)) {
             this._playerType = 'vimeo'
             const videoId = this._extractVimeoID(src)
-            embedHTML = `<iframe id="vimeoPlayer" src="https://player.vimeo.com/video/${videoId}?${
-                autoplay ? 'autoplay=1' : ''
-            }" frameborder="0" ${allowAttrs} ${fullscreenAttr} title="Vimeo Video"></iframe>`
-            setTimeout(() => this._setupVimeoPlayer(), 500)
+            if (!videoId) {
+                embedHTML = `<div class="error">Invalid Vimeo video URL provided.</div>`
+            } else {
+                embedHTML = `<iframe id="vimeoPlayer" src="https://player.vimeo.com/video/${videoId}?${
+                    autoplay ? 'autoplay=1' : ''
+                }" frameborder="0" ${allowAttrs} ${fullscreenAttr} title="Vimeo Video"></iframe>`
+                setTimeout(() => this._setupVimeoPlayer(), 500)
+            }
         }
         // Self-hosted
         else {
             this._playerType = 'self-hosted'
-            let sourcesHTML = ''
-            if (sources) {
-                try {
-                    const parsed: { src: string; type: string }[] =
-                        JSON.parse(sources)
-                    sourcesHTML = parsed
-                        .map((s) => `<source src="${s.src}" type="${s.type}">`)
-                        .join('\n')
-                } catch (e) {
-                    console.warn('Invalid JSON in sources attribute:', e)
+            if (!src) {
+                embedHTML = `<div class="error">No video URL provided.</div>`
+            } else {
+                let sourcesHTML = ''
+                if (sources) {
+                    try {
+                        const parsed: { src: string; type: string }[] =
+                            JSON.parse(sources)
+                        sourcesHTML = parsed
+                            .map(
+                                (s) =>
+                                    `<source src="${s.src}" type="${s.type}">`
+                            )
+                            .join('\n')
+                    } catch (e) {
+                        console.warn('Invalid JSON in sources attribute:', e)
+                    }
                 }
-            }
-            embedHTML = `<video id="selfHostedPlayer" ${
-                autoplay ? 'autoplay' : ''
-            } controls>
+                embedHTML = `<video id="selfHostedPlayer" ${
+                    autoplay ? 'autoplay' : ''
+                } controls>
         ${sourcesHTML || `<source src="${src}" type="video/mp4">`}
         Your browser does not support the video tag.
       </video>`
-            setTimeout(() => this._setupSelfHostedPlayer(), 500)
+                setTimeout(() => this._setupSelfHostedPlayer(), 500)
+            }
         }
 
         container.innerHTML = embedHTML

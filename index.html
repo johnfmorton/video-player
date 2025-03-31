@@ -9,10 +9,10 @@
   <script type="module" src="demo-page-assets/demo.ts"></script>
 
 
-    <!-- YouTube IFrame API -->
-    <script src="https://www.youtube.com/iframe_api"></script>
-    <!-- Vimeo API, if needed -->
-    <script src="https://player.vimeo.com/api/player.js"></script>
+  <!-- YouTube IFrame API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <!-- Vimeo API, if needed -->
+  <script src="https://player.vimeo.com/api/player.js"></script>
 
   <style>
 
@@ -26,63 +26,90 @@
       <div class="mx-auto lg:mx-0 prose">
         <h1 class=" font-bold tracking-tight text-gray-900 mb-6">Video Player Demo Page</h1>
         <p>
-          Have you ever wanted a single video tag for all your video needs? This web component is a custom video player that can handle
-          YouTube, Vimeo, and self-hosted videos. It also has a custom aspect ratio feature. You can also add a poster image, if you want.
+          This web-component was built because I needed a video player that could handle YouTube, Vimeo, and self-hosted videos and support uploading a custom poster frame. It also unifies the video events events work consistently no matter which video type your page includes. The examples below will display event notifications to demonstrate the events and data you can expect.
         </p>
 
-        <p>Video play events are normalized across all player types. No more figuring out how to listen for different play events in different players.</p>
-
-        <p>Keyboard accessbile.</p>
-
-        <div class="">
-
-          <pre class="whitespace-pre-line bg-slate-200 p-4 rounded text-blue-900 text-xs">
-                                &lt;video-player
-                                src="/cat-head-rub.mp4" &lt;-- Can be a YouTube or Vimeo URL or a self-hosted video
-                                allowfullscreen &lt;-- Optional
-                                aspect-ratio="9x16" &lt;-- Default is 16x9
-                                poster="self-hosted-9x16.jpg" &lt;-- Optional
-                                playbutton &lt;-- Optional
-
-                                >&lt;/video-player>
-                              </pre>
-        </div>
+        <p>The web-component is also keyboard accessbile and has been designed for accessbility. Feedback is welcome to make this as accessbile as possible.</p>
 
 
-        <div class="flex flex-col sm:flex-row gap-3">
-          <div class="w-full sm:w-1/2">
-            <h2 class="text-lg mb-1">YouTube example</h2>
-            <video-player src="https://www.youtube.com/watch?v=bdFROVpgeZA" allowfullscreen class="flex-1" aspect-ratio="16x9" playbutton posters='{
-                      "webp": "youtube-hosted-16x9.webp",
-                      "jpg": "youtube-hosted-16x9.jpg",
-                      "png": "youtube-hosted-16x9.png"
+<h2>Installtion and source code</h2>
+
+<p>This web component can be found on NPM at <a href="https://www.npmjs.com/package/@morton-studio/video-player">https://www.npmjs.com/package/@morton-studio/video-player</a> and the GitHub repo is at <a href="https://github.com/johnfmorton/video-player">https://github.com/johnfmorton/video-player</a>.</p>
+
+
+
+          <div class="w-full">
+            <h2>Examples</h2>
+            <h3 class="text-lg mb-1">YouTube hosted video example</h2>
+            <video-player src="https://www.youtube.com/watch?v=bdFROVpgeZA" allowfullscreen class="flex-1" aspect-ratio="16x9" posteralt="A robot with a speech bubble next to a sign saying 'Bespoken' and a YouTube logo." playbutton posters='{
+                      "webp": "you-tube-bespoken.webp",
+                      "jpg": "you-tube-bespoken.jpg"
                     }' id="youtube-example"></video-player>
-
+            <pre class="whitespace-pre-line bg-slate-200 p-4 rounded text-blue-900 text-xs">
+              &lt;video-player
+              src="https://www.youtube.com/watch?v=bdFROVpgeZA" &lt;-- Required
+              allowfullscreen &lt;-- Optional
+              aspect-ratio="16x9" &lt;-- Default is 16x9; Also supports 4x3, 1x1, 9x16
+              playbutton &lt;-- Optional
+              posters='{
+                "webp": "you-tube-bespoken.webp",
+                "jpg": "you-tube-bespoken.jpg"
+              }'
+              posteralt="A robot with a speech bubble next to a sign saying 'Bespoken' and a YouTube logo." &lt;-- Optional
+              >&lt;/video-player>
+            </pre>
+<hr class="my-8 border" />
           </div>
-          <div class="w-full sm:w-1/2">
-            <h2 class="text-lg mb-1">Vimeo example</h2>
-            <video-player src="https://vimeo.com/166865309" poster="vimeo-hosted-16x9.jpg" allowfullscreen playbutton id="vimeo-example"></video-player>
+          <div class="w-full">
+            <h3 class="text-lg mb-1">Vimeo hosted video example</h2>
+            <video-player src="https://vimeo.com/166865309" poster="vimeo-nice-fountains.jpg" allowfullscreen playbutton id="vimeo-example"></video-player>
+            <pre class="whitespace-pre-line bg-slate-200 p-4 rounded text-blue-900 text-xs">
+                          &lt;video-player
+                          src="https://vimeo.com/166865309"
+                          poster="vimeo-nice-fountains.jpg"
+                          allowfullscreen
+                          playbutton>&lt;/video-player>
+                        </pre>
           </div>
         </div>
 
+<hr class="my-8 border" />
 
-           <div class="flex flex-row gap-3">
-            <div class="w-1/2">
-              <h2 class="text-lg mb-1">Self-hosted video example</h2>
-              <video-player src="cat-head-rub.mp4" allowfullscreen aspect-ratio="9x16" playbutton poster="self-hosted-9x16.jpg" id="self-hosted-example"></video-player>
-            </div>
-          <div class="w-1/2">
-            <h2 class="text-lg mb-1">YouTube Shorts video example</h2>
-          <video-player src="https://www.youtube.com/shorts/cWRmknW0hjM" allowfullscreen playbutton aspect-ratio="9x16" poster="youtube-shorts-9x16.jpg" id="youtube-short-example"></video-player>
+          <div class="w-full">
+            <h3 class="text-lg mb-1">Self-hosted video example</h2>
+            <video-player src="cat-head-rub.mp4" allowfullscreen aspect-ratio="9x16" playbutton poster="self-hosted-9x16.jpg" id="self-hosted-example" class="md:max-w-80 mx-auto"></video-player>
+            <pre class="whitespace-pre-line bg-slate-200 p-4 rounded text-blue-900 text-xs">
+                                      &lt;video-player
+                                      src="cat-head-rub.mp4"
+                                      allowfullscreen
+                                      aspect-ratio="9x16"
+                                      playbutton
+                                      poster="self-hosted-9x16.jpg">&lt;/video-player>
+                                    </pre>
           </div>
-        </div>
+          <hr class="my-8 border" />
+          <div class="w-full">
+            <h3 class="text-lg mb-1">YouTube Shorts video example</h2>
+            <video-player src="https://www.youtube.com/shorts/cWRmknW0hjM" allowfullscreen playbutton aspect-ratio="9x16" poster="youtube-shorts-9x16.jpg" id="youtube-short-example" class="md:max-w-80 mx-auto"></video-player>
+            <pre class="whitespace-pre-line bg-slate-200 p-4 rounded text-blue-900 text-xs">
+                          &lt;video-player
+                          src="https://www.youtube.com/shorts/cWRmknW0hjM"
+                          allowfullscreen
+                          playbutton
+                          aspect-ratio="9x16"
+                          poster="youtube-shorts-9x16.jpg">&lt;/video-player>
+                        </pre>
+          </div>
 
-  <div class="flex flex-row gap-3">
 
-  </div>
+        <div class="flex flex-row gap-3">
+
+
+
 
 
       </div>
+
     </div>
   </div>
 </body>

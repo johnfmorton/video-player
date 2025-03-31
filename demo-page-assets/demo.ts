@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     customEvent.detail.currentTime ? (customEvent.detail.currentTime + ' sec') : 'no time available'
                 const text =
                     'src: ' + customEvent.detail.src + ' / time: ' + time
-                showNotice(title, text)
+                showNotice(title, text, _eventToType(eventName))
             })
         })
     } else {
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     customEvent.detail.currentTime ? (customEvent.detail.currentTime + ' sec') : 'no time available'
                 const text =
                     'src: ' + customEvent.detail.src + ' / time: ' + time
-                showNotice(title, text)
+                showNotice(title, text, _eventToType(eventName))
             })
         })
     } else {
@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     customEvent.detail.currentTime ? (customEvent.detail.currentTime + ' sec') : 'no time available'
                 const text =
                     'src: ' + customEvent.detail.src + ' / time: ' + time
-                showNotice(title, text)
+                showNotice(title, text, _eventToType(eventName))
             })
         })
     } else {
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     customEvent.detail.currentTime ? (customEvent.detail.currentTime + ' sec') : 'no time available'
                 const text =
                     'src: ' + customEvent.detail.src + ' / time: ' + time
-                showNotice(title, text)
+                showNotice(title, text, _eventToType(eventName))
             })
         })
     } else {
@@ -112,12 +112,49 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 })
 
+
+const _eventToType = (eventName: string) => {
+  switch (eventName) {
+
+    case 'video-load':
+      return 'info'
+    case 'video-play':
+      return 'success'
+    case 'video-pause':
+      return 'warning'
+    case 'video-ended':
+      return 'error'
+    default:
+      return 'info'
+  }
+}
+
 // showNotice function
-const showNotice = (title: string, text: string) => {
+const showNotice = (title: string, text: string, type: string = 'info') => {
+  let status = 'info' as 'info' | 'success' | 'warning' | 'error';
+
+  switch (type) {
+    case 'info':
+      status = 'info'
+      break
+    case 'error':
+      status = 'error'
+      break
+    case 'success':
+      status = 'success'
+      break
+    case 'warning':
+      status = 'warning'
+      break
+    default:
+      status = 'info'
+  }
+
+
     new Notify({
         title: title,
         text: text,
-        status: 'success',
+        status,
         effect: 'slide',
         autoclose: true,
         autotimeout: 6500,
