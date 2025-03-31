@@ -1,6 +1,6 @@
 {
     "name": "@morton-studio/video-player",
-    "version": "1.0.0-beta.4",
+    "version": "1.0.0-beta.5",
     "description": "A web component for playing videos with suport for YouTube, Vimeo and self-hosted video.",
     "files": [
         "dist"

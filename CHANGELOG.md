@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - WIP
 
+## [1.0.0-beta.5] - 2025-03-31
+
+- Fixed an issue with the `video-player` web component on iOS where the YouTube video would not play as expected when user clicked a poster frame. This change improves the user experience on iOS devices and ensures consistent behavior across platforms.
+
+## [1.0.0-beta.4] - 2025-03-29
+
+- Not released publicly.
+
 ## [1.0.0-beta.3] - 2025-03-28
 
 - No code changes in the web component. Documentation work in progress.
