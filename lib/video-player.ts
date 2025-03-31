@@ -208,37 +208,62 @@ export class VideoPlayer extends HTMLElement {
     `;
 
     // Attach both click and keydown listeners to interactive elements
-    const clickTargets = this.shadowRoot!.querySelectorAll('[role="button"]');
+    const clickTargets = this.shadowRoot!.querySelectorAll('[role="button"]')
     clickTargets.forEach((el) => {
-      const handler = () => {
-        this._playerType = this._detectPlayerType(src);
-        // Only for self-hosted, emit video-play immediately when poster exists.
-        if (this.shadowRoot!.querySelector('.poster') && (this._playerType === 'self-hosted' || this._playerType === 'youtube')) {
-    this._emitEvent('video-play')
-}
-        this._loadVideo({
-          src,
-          sources,
-          allowFullscreen: !!allowFullscreen,
-          autoplay: true,
-        });
-      };
-      el?.addEventListener('click', handler, { passive: true });
-      el?.addEventListener('keydown', (e) => {
-        const key = (e as KeyboardEvent).key;
-        if (key === 'Enter' || key === ' ') {
-          e.preventDefault();
-          handler();
-          // For self-hosted videos, set focus on the video element after loading
-          if (this._playerType === 'self-hosted') {
-            setTimeout(() => {
-              const video = this.shadowRoot!.querySelector('#selfHostedPlayer') as HTMLVideoElement;
-              video?.focus();
-            }, 600);
-          }
+        const handler = () => {
+            // Detect the player type based on the src.
+            this._playerType = this._detectPlayerType(src)
+
+            // YouTube block
+            if (this._playerType === 'youtube') {
+                if (this.shadowRoot!.querySelector('.poster')) {
+                    this._emitEvent('video-play')
+                }
+                // Add any additional YouTube-specific logic here.
+            }
+
+            // Vimeo block
+            if (this._playerType === 'vimeo') {
+                // Add any Vimeo-specific logic here.
+            }
+
+            // Self-hosted block
+            if (this._playerType === 'self-hosted') {
+                if (this.shadowRoot!.querySelector('.poster')) {
+                    this._emitEvent('video-play')
+                }
+                // Add any additional self-hosted specific logic here.
+            }
+
+            // Call loadVideo for all player types.
+            this._loadVideo({
+                src,
+                sources,
+                allowFullscreen: !!allowFullscreen,
+                autoplay: true,
+            })
         }
-      });
-    });
+
+        el?.addEventListener('click', handler, { passive: true })
+
+        el?.addEventListener('keydown', (e) => {
+            const key = (e as KeyboardEvent).key
+            if (key === 'Enter' || key === ' ') {
+                e.preventDefault()
+                handler()
+
+                // For self-hosted videos, set focus on the video element after loading.
+                if (this._playerType === 'self-hosted') {
+                    setTimeout(() => {
+                        const video = this.shadowRoot!.querySelector(
+                            '#selfHostedPlayer'
+                        ) as HTMLVideoElement
+                        video?.focus()
+                    }, 600)
+                }
+            }
+        })
+    })
 
     if (!posterHTML) {
       this._playerType = this._detectPlayerType(src);
