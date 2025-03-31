@@ -308,10 +308,9 @@ export class VideoPlayer extends HTMLElement {
                     this.shadowRoot!.querySelector('.video-container')
                 container?.classList.remove('hidden')
 
-              if (this._playerType === 'youtube') {
-                console.log('YouTube player type detected', this._ytPlayer);
-                // this._emitEvent('video-play')
-                // if (!posterHTML) {
+                if (this._playerType === 'youtube') {
+                    console.log('YouTube player type detected', this._ytPlayer)
+
                     this._playerType = this._detectPlayerType(src)
                     // this._emitEvent('video-load')
                     this._loadVideo({
@@ -320,13 +319,8 @@ export class VideoPlayer extends HTMLElement {
                         allowFullscreen: !!allowFullscreen,
                         autoplay: true,
                     })
-                // }
-                // console.log(
-                //     'YouTube player playVideo function:',
-                //     this._ytPlayer.playVideo
-                // )
-                //     debugger
-                //     // If the YouTube player instance exists and has a playVideo function
+
+                    // If the YouTube player instance exists and has a playVideo function
                     if (
                         this._ytPlayer &&
                         typeof this._ytPlayer.playVideo === 'function'
