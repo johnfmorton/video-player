@@ -11,6 +11,8 @@ export declare class VideoPlayer extends HTMLElement {
     private _playerType;
     private _ytPlayer;
     private _vimeoPlayer;
+    private _ytPlayerReady;
+    private _playOnReady;
     static get observedAttributes(): string[];
     constructor();
     attributeChangedCallback(_name: string, oldValue: string | null, newValue: string | null): void;
