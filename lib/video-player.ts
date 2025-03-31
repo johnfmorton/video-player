@@ -14,6 +14,7 @@ export interface VideoEventDetail {
 
 export interface VideoPlayerEvent extends CustomEvent<VideoEventDetail> {}
 
+// VideoPlayer Custom Element: Manages video playback from self-hosted, YouTube, and Vimeo sources.
 export class VideoPlayer extends HTMLElement {
     private _playerType: 'self-hosted' | 'youtube' | 'vimeo' = 'self-hosted'
     private _ytPlayer: any
@@ -36,6 +37,7 @@ export class VideoPlayer extends HTMLElement {
         ]
     }
 
+    // Constructor: Initializes the video player by attaching a shadow DOM and rendering the initial content.
     constructor() {
         super()
         // Removed tabindex on host to avoid extra tab stops.
@@ -44,6 +46,7 @@ export class VideoPlayer extends HTMLElement {
         this._render()
     }
 
+    // attributeChangedCallback: Invoked when any observed attribute changes. Triggers re-rendering of the component.
     attributeChangedCallback(
         _name: string,
         oldValue: string | null,
@@ -54,6 +57,7 @@ export class VideoPlayer extends HTMLElement {
         }
     }
 
+    // _emitEvent: Emits a custom event (e.g., video-play, video-pause) with details about the current video state, based on the player type.
     private _emitEvent(eventName: string) {
         if (this._playerType === 'self-hosted') {
             const video = this.shadowRoot!.querySelector(
@@ -126,6 +130,7 @@ export class VideoPlayer extends HTMLElement {
         }
     }
 
+    // _detectPlayerType: Determines the video player type (YouTube, Vimeo, or self-hosted) from the provided source URL.
     private _detectPlayerType(
         src: string
     ): 'youtube' | 'vimeo' | 'self-hosted' {
@@ -135,6 +140,7 @@ export class VideoPlayer extends HTMLElement {
     }
 
     // Converts an aspect ratio string like "16x9" into CSS format "16 / 9"
+    // _getCssAspectRatio: Converts an aspect ratio string (e.g., '16x9') into a CSS-compatible format (e.g., '16 / 9').
     private _getCssAspectRatio(aspect: string): string {
         const parts = aspect.split('x')
         if (
@@ -147,6 +153,7 @@ export class VideoPlayer extends HTMLElement {
         return '16 / 9'
     }
 
+    // _render: Renders the video player UI including the poster image, play button, and video container, then attaches event listeners for interactions.
     private _render() {
         const src = this.getAttribute('src') || ''
         const sources = this.hasAttribute('sources')
@@ -367,6 +374,7 @@ export class VideoPlayer extends HTMLElement {
         })
     }
 
+    // _loadVideo: Loads and embeds the appropriate video player (iframe for YouTube/Vimeo or video element for self-hosted) based on the source URL and attributes.
     private _loadVideo({
         src,
         sources,
@@ -439,6 +447,7 @@ export class VideoPlayer extends HTMLElement {
         }
     }
 
+    // _setupYouTubePlayer: Initializes the YouTube player using the YouTube API and sets up event handlers for player state changes.
     private _setupYouTubePlayer() {
         const iframe = this.shadowRoot!.querySelector(
             '#ytPlayer'
@@ -467,6 +476,7 @@ export class VideoPlayer extends HTMLElement {
         })
     }
 
+    // _setupVimeoPlayer: Initializes the Vimeo player using the Vimeo API and sets up event handlers for player state changes.
     private _setupVimeoPlayer() {
         const iframe = this.shadowRoot!.querySelector(
             '#vimeoPlayer'
@@ -489,6 +499,7 @@ export class VideoPlayer extends HTMLElement {
         this._vimeoPlayer.on('ended', () => this._emitEvent('video-ended'))
     }
 
+    // _setupSelfHostedPlayer: Sets up the self-hosted video element by attaching event listeners for play, pause, and ended events, and ensures accessibility by focusing the video.
     private _setupSelfHostedPlayer() {
         const video = this.shadowRoot!.querySelector(
             '#selfHostedPlayer'
@@ -506,6 +517,7 @@ export class VideoPlayer extends HTMLElement {
         video.focus()
     }
 
+    // _extractYouTubeID: Extracts the YouTube video ID from the provided URL using a regular expression.
     private _extractYouTubeID(url: string): string {
         const regExp =
             /(?:youtube\.com\/(?:shorts\/|watch\?v=|embed\/)|youtu\.be\/)([^"&?\/\s]{11})/
@@ -513,6 +525,7 @@ export class VideoPlayer extends HTMLElement {
         return match ? match[1] : ''
     }
 
+    // _extractVimeoID: Extracts the Vimeo video ID from the provided URL using a regular expression.
     private _extractVimeoID(url: string): string {
         const regExp = /vimeo\.com\/(?:video\/)?(\d+)/
         const match = url.match(regExp)
@@ -520,6 +533,7 @@ export class VideoPlayer extends HTMLElement {
     }
 }
 
+// registerVideoPlayer: Registers the VideoPlayer custom element with the browser if it hasn't been registered already.
 export function registerVideoPlayer(tagName = 'video-player') {
     if (!customElements.get(tagName)) {
         customElements.define(tagName, VideoPlayer)
