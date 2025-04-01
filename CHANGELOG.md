@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - WIP
 
+## [1.0.0-beta.9] - 2025-04-01
+
+- Fixed an issue in the YouTube setup function to prevent the setup from starting if the YouTube API is not loaded using the `onYouTubeIframeAPIReady` callback. This change ensures that the YouTube player is only initialized when the API is ready, preventing potential errors and improving the reliability of the component.
+- Updated debounce to 1 second for the `video-play` event.
+
 ## [1.0.0-beta.8] - 2025-04-01
 
 - Fix: The duplicate `video-play` events continued to happen after the previous fix. This had something to do with network latency which made debugging difficult. In this version, beta.8, I've added a debounce of 500ms to the `video-play` event. This should prevent the duplicate events from firing when the user clicks the poster image on YouTube videos.

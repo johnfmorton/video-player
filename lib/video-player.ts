@@ -64,7 +64,7 @@ export class VideoPlayer extends HTMLElement {
         }
     }
 
-    private _debounceInterval = 500 // adjust as needed
+    private _debounceInterval = 1000 // 1 second, adjust as needed
     private _lastPlayEventTime = 0
 
     // _emitEvent: Emits a custom event (e.g., video-play, video-pause) with details about the current video state, based on the player type.
@@ -510,30 +510,45 @@ export class VideoPlayer extends HTMLElement {
 
     // _setupYouTubePlayer: Initializes the YouTube player using the YouTube API and sets up event handlers for player state changes.
     private _setupYouTubePlayer() {
-        const iframe = this.shadowRoot!.querySelector(
-            '#ytPlayer'
-        ) as HTMLIFrameElement
-        if (!iframe) return
+        const iframe = this.shadowRoot!.querySelector('#ytPlayer') as HTMLIFrameElement;
+        if (!iframe) return;
 
+        // If the YouTube API is already available, set up immediately
+        if (window.YT && window.YT.Player) {
+            this._initializeYouTubePlayer(iframe);
+        } else {
+            // Otherwise, wait for onYouTubeIframeAPIReady
+            const existingCallback = (window as any).onYouTubeIframeAPIReady;
+            (window as any).onYouTubeIframeAPIReady = () => {
+                if (existingCallback) {
+                    existingCallback();
+                }
+                this._initializeYouTubePlayer(iframe);
+            };
+        }
+    }
+
+    // _initializeYouTubePlayer: Helper to do the actual new YT.Player call
+    private _initializeYouTubePlayer(iframe: HTMLIFrameElement) {
         this._ytPlayer = new YT.Player(iframe, {
             events: {
                 onReady: (event: any) => {
-                    this._ytPlayerReady = true
+                    this._ytPlayerReady = true;
                     if (this._playOnReady) {
-                        event.target.playVideo()
-                        this._playOnReady = false
+                        event.target.playVideo();
+                        this._playOnReady = false;
                     }
                 },
                 onStateChange: (event: any) => {
                     if (event.data === YT.PlayerState.PLAYING)
-                        this._emitEvent('video-play')
+                        this._emitEvent('video-play');
                     if (event.data === YT.PlayerState.PAUSED)
-                        this._emitEvent('video-pause')
+                        this._emitEvent('video-pause');
                     if (event.data === YT.PlayerState.ENDED)
-                        this._emitEvent('video-ended')
+                        this._emitEvent('video-ended');
                 },
             },
-        })
+        });
     }
 
     // _setupVimeoPlayer: Initializes the Vimeo player using the Vimeo API and sets up event handlers for player state changes.
