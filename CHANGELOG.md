@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - WIP
 
+## [1.0.0-beta.7] - 2025-04-01
+
+- Fixed a new issue where no initial `video-play` event was fired when the user clicked the poster image on YouTube videos. This basically undoes the previous version's fix for a duplicate event firing.
+- Added directions for CDN usage via unpkg and jsDelivr to the README.
+- Added automatic web component initialization for CDN users. This means that if you include the component via a CDN, it will automatically register itself without needing to call `registerVideoPlayer()` in your JavaScript. This change simplifies the usage of the component for users who prefer to use a CDN.
+
 ## [1.0.0-beta.6] - 2025-03-31
 
 - Fixed duplicate play event when clicking a YouTube video that had a poster image.

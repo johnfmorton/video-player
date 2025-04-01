@@ -12,23 +12,48 @@ A fully customizable and responsive Web Component that supports:
 
 ## Installation
 
+### Using a package manager
+
+#### npm
+
+
 The `video-player` component is available via npm at [https://www.npmjs.com/package/@morton-studio/video-player](https://www.npmjs.com/package/@morton-studio/video-player).
 
-You can install it using:
+Install it with npm:
 
 ```sh
 npm install @morton-studio/video-player
 ```
 
-## Usage
-
-Import and register the component in your JavaScript file:
+Next, import and register the component in your JavaScript file. Note that you can register the component with a custom tag name when using npm.
 
 ```js
 import { registerVideoPlayer } from 'video-player'
 registerVideoPlayer()
-// or registerVideoPlayer('my-video-player')
+
+// If want to customize the tag name:
+// registerVideoPlayer('my-video-player')
 ```
+
+### CDN
+
+If you prefer not to use npm, you can include the component directly in your HTML file. This will load the latest version from a CDN and register the component automatically.
+
+#### jsDelivr
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/@morton-studio/video-player@latest/dist/video-player.es.js"></script>
+```
+
+#### unpkg
+
+```html
+<script type="module" src="https://unpkg.com/@morton-studio/video-player@latest/dist/video-player.es.js"></script>
+```
+
+If you are using the CDN version, you don't need to do anything else. The component will be registered automatically using the default tag name `<video-player>` in your HTML.
+
+## Usage
 
 Then use it in your HTML:
 
@@ -36,7 +61,7 @@ Then use it in your HTML:
 <video-player src="video.mp4"></video-player>
 ```
 
-### Recommended: Install the YouTube API and Vimeo API
+### Optional: Install the YouTube API and Vimeo API
 
 To enable the YouTube and Vimeo APIs, install the following packages in your project:
 

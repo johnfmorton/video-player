@@ -342,8 +342,9 @@ export class VideoPlayer extends HTMLElement {
                 if (this._playerType === 'youtube') {
                     console.log('YouTube player type detected', this._ytPlayer)
 
-                    this._playerType = this._detectPlayerType(src)
-
+                  this._playerType = this._detectPlayerType(src)
+                  console.log('YouTube player EMIT 1')
+                    this._emitEvent('video-load')
                     this._loadVideo({
                         src,
                         sources,
@@ -357,7 +358,9 @@ export class VideoPlayer extends HTMLElement {
                         typeof this._ytPlayer.playVideo === 'function'
                     ) {
                         if (this._ytPlayerReady) {
-                            this._ytPlayer.playVideo()
+                          this._ytPlayer.playVideo()
+                          console.log('YouTube player EMIT 2')
+                          this._emitEvent('video-play')
                         } else {
                             this._playOnReady = true
                         }
@@ -567,6 +570,15 @@ export class VideoPlayer extends HTMLElement {
         const match = url.match(regExp)
         return match ? match[1] : ''
     }
+}
+
+// register the custom element for umd
+if (typeof window !== 'undefined') {
+  // Check if the custom element is already defined
+  if (!customElements.get('video-player')) {
+    // Define the custom element
+    customElements.define('video-player', VideoPlayer)
+  }
 }
 
 // registerVideoPlayer: Registers the VideoPlayer custom element with the browser if it hasn't been registered already.
