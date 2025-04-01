@@ -64,11 +64,15 @@ export class VideoPlayer extends HTMLElement {
         }
     }
 
-    private _debounceInterval = 1000 // 1 second, adjust as needed
+    private _debounceInterval = 500 // 0.5 second, adjust as needed
     private _lastPlayEventTime = 0
 
     // _emitEvent: Emits a custom event (e.g., video-play, video-pause) with details about the current video state, based on the player type.
-    private _emitEvent(eventName: string) {
+  private _emitEvent(eventName: string, initialPosterClick = false) {
+
+
+
+
         // If this is a "video-play" event, check for debounce
         if (eventName === 'video-play') {
             const now = performance.now()
@@ -77,6 +81,16 @@ export class VideoPlayer extends HTMLElement {
                 return
             }
             this._lastPlayEventTime = now
+
+          // If this is an initial poster click, set the last play event time to 5 seconds in the future
+          // This is to prevent the play event from being emitted too quickly after the poster is clicked
+          // This is a workaround for the fact that the YouTube player is unreliable in firing the play event
+          // when the poster is clicked. Sometimes it fires, sometimes it doesn't. So, we manually set
+          // the last play event time to 5 seconds in the future to prevent the play event from being emitted
+          // too quickly after the poster is clicked.
+            if (initialPosterClick) {
+                this._lastPlayEventTime = performance.now() + 5000
+            }
         }
 
         // The YouTube branch now only fires after the player is ready (via onStateChange)
@@ -372,7 +386,7 @@ export class VideoPlayer extends HTMLElement {
                         allowFullscreen: !!allowFullscreen,
                         autoplay: true,
                     })
-                    this._emitEvent('video-play')
+                    this._emitEvent('video-play', true)
 
                     // If the YouTube player instance exists and has a playVideo function
                     if (
@@ -381,7 +395,7 @@ export class VideoPlayer extends HTMLElement {
                     ) {
                         if (this._ytPlayerReady) {
                             this._ytPlayer.playVideo()
-                            this._emitEvent('video-play')
+                            this._emitEvent('video-play', true)
                         } else {
                             this._playOnReady = true
                         }
