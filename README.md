@@ -31,7 +31,7 @@ Next, import and register the component in your JavaScript file. Note that you c
 import { registerVideoPlayer } from 'video-player'
 registerVideoPlayer()
 
-// If want to customize the tag name:
+// If you want to customize the tag name, pass in a string:
 // registerVideoPlayer('my-video-player')
 ```
 
@@ -63,7 +63,7 @@ Then use it in your HTML:
 
 ### Optional: Install the YouTube API and Vimeo API
 
-To enable the YouTube and Vimeo APIs, install the following packages in your project:
+You may include the YouTube and Vimeo APIs in your HTML file if you want to use their features directly. This is optional, as the component will automatically load them if needed by looking on the Window object for `YT` or `Vimeo`.
 
 ```html
 <!-- YouTube iFrame API, if needed -->
@@ -71,10 +71,6 @@ To enable the YouTube and Vimeo APIs, install the following packages in your pro
 <!-- Vimeo API, if needed -->
 <script src="https://player.vimeo.com/api/player.js"></script>
 ```
-
-You only need to include the YouTube API and Vimeo API if you plan to use the YouTube or Vimeo video sources. If you are only using self-hosted videos, you can skip this step.
-
-The web component will automatically detect the video source and load the appropriate API if needed by looking on the Window object for `YT` or `Vimeo`.  If you do it yourself, the plugin will be able to use the API directly instead of loading it via the plugin.
 
 ## 🚀 Features
 
