@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - WIP
 
+## [1.0.0-beta.8] - 2025-04-01
+
+- Fix: The duplicate `video-play` events continued to happen after the previous fix. This had something to do with network latency which made debugging difficult. In this version, beta.8, I've added a debounce of 500ms to the `video-play` event. This should prevent the duplicate events from firing when the user clicks the poster image on YouTube videos.
+
 ## [1.0.0-beta.7] - 2025-04-01
 
 - Fixed a new issue where no initial `video-play` event was fired when the user clicked the poster image on YouTube videos. This basically undoes the previous version's fix for a duplicate event firing.
