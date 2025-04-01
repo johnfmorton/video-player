@@ -1,10 +1,10 @@
 /**
  * name: @morton-studio/video-player
- * version: v1.0.0-beta.9
+ * version: v1.0.0-beta.10
  * description: A web component for playing videos with suport for YouTube, Vimeo and self-hosted video.
  * author: John F. Morton <john@johnfmorton.com> (https://johnfmorton.com)
  * repository: git+https://github.com/johnfmorton/video-player.git
- * build date: 2025-04-01T16:46:30.024Z
+ * build date: 2025-04-01T17:05:21.425Z
  */
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
@@ -18,8 +18,8 @@ class VideoPlayer extends HTMLElement {
     __publicField(this, "_vimeoPlayer");
     __publicField(this, "_ytPlayerReady", false);
     __publicField(this, "_playOnReady", false);
-    __publicField(this, "_debounceInterval", 1e3);
-    // 1 second, adjust as needed
+    __publicField(this, "_debounceInterval", 500);
+    // 0.5 second, adjust as needed
     __publicField(this, "_lastPlayEventTime", 0);
     this.attachShadow({ mode: "open" });
     this._playerType = "self-hosted";
@@ -45,7 +45,7 @@ class VideoPlayer extends HTMLElement {
     }
   }
   // _emitEvent: Emits a custom event (e.g., video-play, video-pause) with details about the current video state, based on the player type.
-  _emitEvent(eventName) {
+  _emitEvent(eventName, initialPosterClick = false) {
     var _a, _b;
     if (eventName === "video-play") {
       const now = performance.now();
@@ -53,6 +53,9 @@ class VideoPlayer extends HTMLElement {
         return;
       }
       this._lastPlayEventTime = now;
+      if (initialPosterClick) {
+        this._lastPlayEventTime = performance.now() + 5e3;
+      }
     }
     if (this._playerType === "self-hosted") {
       const video = this.shadowRoot.querySelector(
@@ -288,11 +291,11 @@ class VideoPlayer extends HTMLElement {
             allowFullscreen: !!allowFullscreen,
             autoplay: true
           });
-          this._emitEvent("video-play");
+          this._emitEvent("video-play", true);
           if (this._ytPlayer && typeof this._ytPlayer.playVideo === "function") {
             if (this._ytPlayerReady) {
               this._ytPlayer.playVideo();
-              this._emitEvent("video-play");
+              this._emitEvent("video-play", true);
             } else {
               this._playOnReady = true;
             }
