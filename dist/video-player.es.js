@@ -1,10 +1,10 @@
 /**
  * name: @morton-studio/video-player
- * version: v1.0.0-beta.6
+ * version: v1.0.0-beta.7
  * description: A web component for playing videos with suport for YouTube, Vimeo and self-hosted video.
  * author: John F. Morton <john@johnfmorton.com> (https://johnfmorton.com)
  * repository: git+https://github.com/johnfmorton/video-player.git
- * build date: 2025-03-31T21:38:47.334Z
+ * build date: 2025-04-01T15:14:31.536Z
  */
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
@@ -269,6 +269,8 @@ class VideoPlayer extends HTMLElement {
         if (this._playerType === "youtube") {
           console.log("YouTube player type detected", this._ytPlayer);
           this._playerType = this._detectPlayerType(src);
+          console.log("YouTube player EMIT 1");
+          this._emitEvent("video-load");
           this._loadVideo({
             src,
             sources,
@@ -278,6 +280,8 @@ class VideoPlayer extends HTMLElement {
           if (this._ytPlayer && typeof this._ytPlayer.playVideo === "function") {
             if (this._ytPlayerReady) {
               this._ytPlayer.playVideo();
+              console.log("YouTube player EMIT 2");
+              this._emitEvent("video-play");
             } else {
               this._playOnReady = true;
             }
@@ -443,6 +447,11 @@ class VideoPlayer extends HTMLElement {
     const regExp = /vimeo\.com\/(?:video\/)?(\d+)/;
     const match = url.match(regExp);
     return match ? match[1] : "";
+  }
+}
+if (typeof window !== "undefined") {
+  if (!customElements.get("video-player")) {
+    customElements.define("video-player", VideoPlayer);
   }
 }
 function registerVideoPlayer(tagName = "video-player") {
