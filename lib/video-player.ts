@@ -87,14 +87,15 @@ export class VideoPlayer extends HTMLElement {
             )
         } else if (
             this._playerType === 'youtube' &&
-            this._ytPlayer &&
-            typeof this._ytPlayer.getCurrentTime === 'function'
+            this._ytPlayer
         ) {
+            // debugger;
+
             const detail: VideoEventDetail = {
                 type: this._playerType,
                 src: this.getAttribute('src'),
-                currentTime: this._ytPlayer.getCurrentTime(),
-                duration: this._ytPlayer.getDuration(),
+                currentTime: this._ytPlayer.playerInfo.currentTime,
+                duration: this._ytPlayer.playerInfo.duration
             }
             this.dispatchEvent(
                 new CustomEvent<VideoEventDetail>(eventName, {
@@ -313,7 +314,7 @@ export class VideoPlayer extends HTMLElement {
             document.head.appendChild(script);
           }
         }
-        this._emitEvent('video-load')
+
         this._loadVideo({
             src,
             sources,
@@ -339,18 +340,17 @@ export class VideoPlayer extends HTMLElement {
                     this.shadowRoot!.querySelector('.video-container')
                 container?.classList.remove('hidden')
 
-                if (this._playerType === 'youtube') {
-                    console.log('YouTube player type detected', this._ytPlayer)
-
+              if (this._playerType === 'youtube') {
+                // debugger;
                   this._playerType = this._detectPlayerType(src)
-                  console.log('YouTube player EMIT 1')
-                    this._emitEvent('video-load')
+
                     this._loadVideo({
                         src,
                         sources,
                         allowFullscreen: !!allowFullscreen,
                         autoplay: true,
                     })
+                    this._emitEvent('video-play')
 
                     // If the YouTube player instance exists and has a playVideo function
                     if (
@@ -359,7 +359,6 @@ export class VideoPlayer extends HTMLElement {
                     ) {
                         if (this._ytPlayerReady) {
                           this._ytPlayer.playVideo()
-                          console.log('YouTube player EMIT 2')
                           this._emitEvent('video-play')
                         } else {
                             this._playOnReady = true
@@ -412,7 +411,7 @@ export class VideoPlayer extends HTMLElement {
         allowFullscreen: boolean
         autoplay: boolean
         removeOverlay?: boolean
-    }) {
+      }) {
         const container = this.shadowRoot!.querySelector('.video-container')
         if (!container) return
 
