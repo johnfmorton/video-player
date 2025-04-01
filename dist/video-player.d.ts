@@ -22,12 +22,15 @@ export declare class VideoPlayer extends HTMLElement {
     static get observedAttributes(): string[];
     constructor();
     attributeChangedCallback(_name: string, oldValue: string | null, newValue: string | null): void;
+    private _debounceInterval;
+    private _lastPlayEventTime;
     private _emitEvent;
     private _detectPlayerType;
     private _getCssAspectRatio;
     private _render;
     private _loadVideo;
     private _setupYouTubePlayer;
+    private _initializeYouTubePlayer;
     private _setupVimeoPlayer;
     private _setupSelfHostedPlayer;
     private _extractYouTubeID;

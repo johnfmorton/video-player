@@ -1,10 +1,10 @@
 /**
  * name: @morton-studio/video-player
- * version: v1.0.0-beta.7
+ * version: v1.0.0-beta.9
  * description: A web component for playing videos with suport for YouTube, Vimeo and self-hosted video.
  * author: John F. Morton <john@johnfmorton.com> (https://johnfmorton.com)
  * repository: git+https://github.com/johnfmorton/video-player.git
- * build date: 2025-04-01T15:14:31.536Z
+ * build date: 2025-04-01T16:46:30.024Z
  */
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
@@ -18,6 +18,9 @@ class VideoPlayer extends HTMLElement {
     __publicField(this, "_vimeoPlayer");
     __publicField(this, "_ytPlayerReady", false);
     __publicField(this, "_playOnReady", false);
+    __publicField(this, "_debounceInterval", 1e3);
+    // 1 second, adjust as needed
+    __publicField(this, "_lastPlayEventTime", 0);
     this.attachShadow({ mode: "open" });
     this._playerType = "self-hosted";
     this._render();
@@ -43,6 +46,14 @@ class VideoPlayer extends HTMLElement {
   }
   // _emitEvent: Emits a custom event (e.g., video-play, video-pause) with details about the current video state, based on the player type.
   _emitEvent(eventName) {
+    var _a, _b;
+    if (eventName === "video-play") {
+      const now = performance.now();
+      if (now - this._lastPlayEventTime < this._debounceInterval) {
+        return;
+      }
+      this._lastPlayEventTime = now;
+    }
     if (this._playerType === "self-hosted") {
       const video = this.shadowRoot.querySelector(
         "#selfHostedPlayer"
@@ -62,12 +73,12 @@ class VideoPlayer extends HTMLElement {
           composed: true
         })
       );
-    } else if (this._playerType === "youtube" && this._ytPlayer && typeof this._ytPlayer.getCurrentTime === "function") {
+    } else if (this._playerType === "youtube" && this._ytPlayer) {
       const detail = {
         type: this._playerType,
         src: this.getAttribute("src"),
-        currentTime: this._ytPlayer.getCurrentTime(),
-        duration: this._ytPlayer.getDuration()
+        currentTime: ((_a = this._ytPlayer.playerInfo) == null ? void 0 : _a.currentTime) ?? 0,
+        duration: ((_b = this._ytPlayer.playerInfo) == null ? void 0 : _b.duration) ?? 0
       };
       this.dispatchEvent(
         new CustomEvent(eventName, {
@@ -234,20 +245,23 @@ class VideoPlayer extends HTMLElement {
     `;
     this._playerType = this._detectPlayerType(src);
     if (this._playerType === "youtube") {
-      if (!window.YT && !document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
+      if (!window.YT && !document.querySelector(
+        'script[src="https://www.youtube.com/iframe_api"]'
+      )) {
         const script = document.createElement("script");
         script.src = "https://www.youtube.com/iframe_api";
         document.head.appendChild(script);
       }
     }
     if (this._playerType === "vimeo") {
-      if (!window.Vimeo && !document.querySelector('script[src="https://player.vimeo.com/api/player.js"]')) {
+      if (!window.Vimeo && !document.querySelector(
+        'script[src="https://player.vimeo.com/api/player.js"]'
+      )) {
         const script = document.createElement("script");
         script.src = "https://player.vimeo.com/api/player.js";
         document.head.appendChild(script);
       }
     }
-    this._emitEvent("video-load");
     this._loadVideo({
       src,
       sources,
@@ -267,20 +281,17 @@ class VideoPlayer extends HTMLElement {
         const container = this.shadowRoot.querySelector(".video-container");
         container == null ? void 0 : container.classList.remove("hidden");
         if (this._playerType === "youtube") {
-          console.log("YouTube player type detected", this._ytPlayer);
           this._playerType = this._detectPlayerType(src);
-          console.log("YouTube player EMIT 1");
-          this._emitEvent("video-load");
           this._loadVideo({
             src,
             sources,
             allowFullscreen: !!allowFullscreen,
             autoplay: true
           });
+          this._emitEvent("video-play");
           if (this._ytPlayer && typeof this._ytPlayer.playVideo === "function") {
             if (this._ytPlayerReady) {
               this._ytPlayer.playVideo();
-              console.log("YouTube player EMIT 2");
               this._emitEvent("video-play");
             } else {
               this._playOnReady = true;
@@ -379,10 +390,22 @@ class VideoPlayer extends HTMLElement {
   }
   // _setupYouTubePlayer: Initializes the YouTube player using the YouTube API and sets up event handlers for player state changes.
   _setupYouTubePlayer() {
-    const iframe = this.shadowRoot.querySelector(
-      "#ytPlayer"
-    );
+    const iframe = this.shadowRoot.querySelector("#ytPlayer");
     if (!iframe) return;
+    if (window.YT && window.YT.Player) {
+      this._initializeYouTubePlayer(iframe);
+    } else {
+      const existingCallback = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = () => {
+        if (existingCallback) {
+          existingCallback();
+        }
+        this._initializeYouTubePlayer(iframe);
+      };
+    }
+  }
+  // _initializeYouTubePlayer: Helper to do the actual new YT.Player call
+  _initializeYouTubePlayer(iframe) {
     this._ytPlayer = new YT.Player(iframe, {
       events: {
         onReady: (event) => {
