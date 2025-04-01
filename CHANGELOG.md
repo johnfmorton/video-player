@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - WIP
 
+## [1.0.0] - 2025-04-01
+
+- Initial release of the `video-player` web component.
+
 ## [1.0.0-beta.10] - 2025-04-01
 
 - Fixed: This version is another attempt at addressing the occasional double `video-play` event firing when the user clicks the poster image on YouTube videos. The general debounce timing has been returned to 500ms. But when the poster image is clicked, the `video-play` event will be fired manually and for 5 seconds afterwards, any `video-play` event that may be fired by the YouTube API will be ignored.

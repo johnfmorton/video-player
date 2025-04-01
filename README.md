@@ -8,6 +8,20 @@ A fully customizable and responsive Web Component that supports:
 - Poster images in AVIF, WebP, JPG, PNG
 - Optional fullscreen, custom play button, and auto-sizing
 
+## Home page and demo
+
+The home page for this project is at [https://github.com/johnfmorton/video-player](https://github.com/johnfmorton/video-player) where you will find the source code.
+
+You can view a working demo of this component at [https://johnfmorton.github.io/video-player/](https://johnfmorton.github.io/video-player/).
+
+## Why?
+
+This web-component was built because I needed a video player that could handle YouTube, Vimeo, and self-hosted videos. The project required being able to have custom poster frames which would load the video player upon click.
+
+I also wanted a self-contained component with a simple API that would allow me to easily add videos to my projects without having to worry about the underlying implementation details.
+
+This is the result.
+
 ---
 
 ## Installation
@@ -28,7 +42,7 @@ npm install @morton-studio/video-player
 Next, import and register the component in your JavaScript file. Note that you can register the component with a custom tag name when using npm.
 
 ```js
-import { registerVideoPlayer } from 'video-player'
+import { registerVideoPlayer } from '@morton-studio/video-player'
 registerVideoPlayer()
 
 // If you want to customize the tag name, pass in a string:
@@ -63,7 +77,9 @@ Then use it in your HTML:
 
 ### Optional: Install the YouTube API and Vimeo API
 
-You may include the YouTube and Vimeo APIs in your HTML file if you want to use their features directly. This is optional, as the component will automatically load them if needed by looking on the Window object for `YT` or `Vimeo`.
+You may include the YouTube and Vimeo APIs in your HTML file if you want to use their features directly in other parts of your application.
+
+This is optional, as the component will automatically load them if needed by looking on the Window object for `YT` or `Vimeo`. If either API is not required, the component will not load them. For example, if you have no Vimeo URLs in `video-player` components on your page, the Vimeo API will not be loaded.
 
 ```html
 <!-- YouTube iFrame API, if needed -->
@@ -279,6 +295,12 @@ registerVideoPlayer('my-video-player');
 - Uses Shadow DOM
 - No external dependencies
 - Easily extensible for subtitles, controls, etc.
+
+---
+
+## 👷 Changelog
+
+All notable changes to this project will be documented in the [CHANGELOG.md](CHANGELOG.md) file.
 
 ---
 
