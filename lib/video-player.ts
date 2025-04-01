@@ -64,8 +64,22 @@ export class VideoPlayer extends HTMLElement {
         }
     }
 
+    private _debounceInterval = 500 // adjust as needed
+    private _lastPlayEventTime = 0
+
     // _emitEvent: Emits a custom event (e.g., video-play, video-pause) with details about the current video state, based on the player type.
     private _emitEvent(eventName: string) {
+        // If this is a "video-play" event, check for debounce
+        if (eventName === 'video-play') {
+            const now = performance.now()
+            if (now - this._lastPlayEventTime < this._debounceInterval) {
+                // Skip this call if it's within our debounce threshold
+                return
+            }
+            this._lastPlayEventTime = now
+        }
+
+        // The YouTube branch now only fires after the player is ready (via onStateChange)
         if (this._playerType === 'self-hosted') {
             const video = this.shadowRoot!.querySelector(
                 '#selfHostedPlayer'
@@ -85,17 +99,13 @@ export class VideoPlayer extends HTMLElement {
                     composed: true,
                 }) as VideoPlayerEvent
             )
-        } else if (
-            this._playerType === 'youtube' &&
-            this._ytPlayer
-        ) {
-            // debugger;
-
+        } else if (this._playerType === 'youtube' && this._ytPlayer) {
+            // For YouTube, reading from the playerInfo or using getCurrentTime() / getDuration()
             const detail: VideoEventDetail = {
                 type: this._playerType,
                 src: this.getAttribute('src'),
-                currentTime: this._ytPlayer.playerInfo.currentTime,
-                duration: this._ytPlayer.playerInfo.duration
+                currentTime: this._ytPlayer.playerInfo?.currentTime ?? 0,
+                duration: this._ytPlayer.playerInfo?.duration ?? 0,
             }
             this.dispatchEvent(
                 new CustomEvent<VideoEventDetail>(eventName, {
@@ -105,6 +115,7 @@ export class VideoPlayer extends HTMLElement {
                 }) as VideoPlayerEvent
             )
         } else if (this._playerType === 'vimeo' && this._vimeoPlayer) {
+            // Promise-based calls for Vimeo
             Promise.all([
                 this._vimeoPlayer.getCurrentTime(),
                 this._vimeoPlayer.getDuration(),
@@ -124,6 +135,7 @@ export class VideoPlayer extends HTMLElement {
                 )
             })
         } else {
+            // Fallback: event without timing data
             const detail: VideoEventDetail = {
                 type: this._playerType,
                 src: this.getAttribute('src'),
@@ -300,19 +312,29 @@ export class VideoPlayer extends HTMLElement {
         this._playerType = this._detectPlayerType(src)
         // Dynamically load YouTube or Vimeo API if not present
         if (this._playerType === 'youtube') {
-          if (!window.YT && !document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
-            const script = document.createElement('script');
-            script.src = 'https://www.youtube.com/iframe_api';
-            document.head.appendChild(script);
-          }
+            if (
+                !window.YT &&
+                !document.querySelector(
+                    'script[src="https://www.youtube.com/iframe_api"]'
+                )
+            ) {
+                const script = document.createElement('script')
+                script.src = 'https://www.youtube.com/iframe_api'
+                document.head.appendChild(script)
+            }
         }
 
         if (this._playerType === 'vimeo') {
-          if (!window.Vimeo && !document.querySelector('script[src="https://player.vimeo.com/api/player.js"]')) {
-            const script = document.createElement('script');
-            script.src = 'https://player.vimeo.com/api/player.js';
-            document.head.appendChild(script);
-          }
+            if (
+                !window.Vimeo &&
+                !document.querySelector(
+                    'script[src="https://player.vimeo.com/api/player.js"]'
+                )
+            ) {
+                const script = document.createElement('script')
+                script.src = 'https://player.vimeo.com/api/player.js'
+                document.head.appendChild(script)
+            }
         }
 
         this._loadVideo({
@@ -340,9 +362,9 @@ export class VideoPlayer extends HTMLElement {
                     this.shadowRoot!.querySelector('.video-container')
                 container?.classList.remove('hidden')
 
-              if (this._playerType === 'youtube') {
-                // debugger;
-                  this._playerType = this._detectPlayerType(src)
+                if (this._playerType === 'youtube') {
+                    // debugger;
+                    this._playerType = this._detectPlayerType(src)
 
                     this._loadVideo({
                         src,
@@ -358,8 +380,8 @@ export class VideoPlayer extends HTMLElement {
                         typeof this._ytPlayer.playVideo === 'function'
                     ) {
                         if (this._ytPlayerReady) {
-                          this._ytPlayer.playVideo()
-                          this._emitEvent('video-play')
+                            this._ytPlayer.playVideo()
+                            this._emitEvent('video-play')
                         } else {
                             this._playOnReady = true
                         }
@@ -411,7 +433,7 @@ export class VideoPlayer extends HTMLElement {
         allowFullscreen: boolean
         autoplay: boolean
         removeOverlay?: boolean
-      }) {
+    }) {
         const container = this.shadowRoot!.querySelector('.video-container')
         if (!container) return
 
